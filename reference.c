@@ -92,8 +92,8 @@ int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
   /* Criar janela */
-  glutInitWindowSize(500.500);
-  glutInitWindowPosition(100.100);
+  glutInitWindowSize(500, 500);
+  glutInitWindowPosition(100, 100);
   glutCreateWindow("mi15054");
   /* Funções de retorno de chamada */
   glutDisplayFunc(on_display);
@@ -134,14 +134,14 @@ static void on_display() {
   /* Configuração da câmera */
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(1, 7 - y_curr, 3, 0.0 - y_curr, -2, 0.1, 0);
+  gluLookAt(1, 7 - y_curr, 3, 0, 0 - y_curr, -2, 0, 1, 0);
   if (campos_estao_inicializados == 0) {
     inicio_da_faixa_z = -12 - 3;
     fields_initialization();
     campos_estao_inicializados = 1;
     all_fields[10][-inicio_da_faixa_z].empty = 1;
   }
-  brilho();
+  iluminacao();
   // auxiliarry_field ();
   terreno();
   soma();
@@ -418,7 +418,7 @@ void auxiliar_field() {
   int i, j;
   glTranslatef(-x_curr, -y_curr, -z_curr);
   glTranslatef(0, 0, -3);
-  glColor3f(1, 0.0);
+  glColor3f(1, 0, 0);
   for (i = 0; i < 20; i++) {
     for (j = 0; j < 20; j++) {
       glBegin(GL_LINE_LOOP);
@@ -489,18 +489,18 @@ void arvore(int x, int z) {
                 : 3;
 
   for (i = 0; i < aux; i++) {
-    glColor3f(51, 0 / 256, 102, 0 / 256, 0);
+    glColor3f(51.0 / 256, 102.0 / 256, 0);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,
-                 (float[4]){51.0 / 256, 102.0 / 256, 0.0});
+                 (float[4]){51.0 / 256, 102.0 / 256, 0, 0});
     glPushMatrix();
     glTranslatef(0, 0.5 + 0.2 + 0.6 + i * 0.7, 0);
     glScalef(1, 0.2, 1);
     glutSolidCube(1);
     glPopMatrix();
 
-    glColor3f(76, 0 / 256, 153, 0 / 256, 0);
+    glColor3f(76.0 / 256, 153.0 / 256, 0);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,
-                 (float[4]){76.0 / 256, 153.0 / 256, 0.0});
+                 (float[4]){76.0 / 256, 153.0 / 256, 0, 0});
     glPushMatrix();
     glTranslatef(0, 0.5 + 0.2 + 0.25 + i * 0.7, 0);
     glScalef(1, 0.5, 1);
@@ -508,7 +508,7 @@ void arvore(int x, int z) {
     glPopMatrix();
   }
 
-  glColor3f(51, 0 / 256, 102, 0 / 256, 0);
+  glColor3f(51.0 / 256, 102.0 / 256, 0);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){51.0 / 256, 102.0 / 256, 0.0});
   glPushMatrix();
   glTranslatef(0, 0.5 + 0.1, 0);
@@ -517,7 +517,7 @@ void arvore(int x, int z) {
   glPopMatrix();
 
   // arvore
-  glColor3f(51, 0 / 256, 25, 0 / 256, 0);
+  glColor3f(51.0 / 256, 25.0 / 256, 0);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){51.0 / 256, 25.0 / 256, 0.0});
   glPushMatrix();
   glScalef(0.5, 1, 0.5);
@@ -540,13 +540,13 @@ void terreno() {
   }
   for (i = -10; i < 0; i++) {
     for (j = 0; j < 20; j++) {
-      if (all_fields[i + 15][j].sum_ou_street != 'u')
+      if (all_fields[i + 15][j].floresta_ou_rua != 'u')
         grama(i, j);
     }
   }
   for (i = 20; i < 30; i++) {
     for (j = 0; j < 20; j++) {
-      if (all_fields[i - 15][j].sum_ou_street != 'u')
+      if (all_fields[i - 15][j].floresta_ou_rua != 'u')
         grama(i, j);
     }
   }
@@ -557,12 +557,12 @@ void terreno() {
 void grama(int x, int z) {
 
   glPushMatrix();
-  glTranslatef(0.0, -3);
+  glTranslatef(0, 0, -3);
   glDisable(GL_LIGHTING);
   if (x % 2 == 1)
-    glColor3f(178, 0 / 256, 255, 0 / 256, 102, 0 / 256);
+    glColor3f(178.0 / 256, 255.0 / 256, 102.0 / 256);
   else
-    glColor3f(166, 0 / 256, 245, 0 / 256, 92, 0 / 256);
+    glColor3f(166.0 / 256, 245.0 / 256, 92.0 / 256);
 
   glBegin(GL_QUADS);
   glVertex3f(x - 10 - 0.5, 0, z - 12 + 0.5);
@@ -610,157 +610,139 @@ void rua() {
 void carro(int x, int z) {
   glPushMatrix();
   glColor3f(1, 1, 0);
-  glTranslatef(-10 + t * 10 - x, 0.3, z + start_trake_z);
+  glTranslatef(-10 + t * 10 - x, 0.3, z + inicio_da_faixa_z);
   // Gume i ratkapne
-  // Frente direita
+  // Prednja desna
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.1, 0.1, 0.1, 0});
   glPushMatrix();
   glTranslatef(0.45, -0.1, 0.4);
   glScalef(1, 1, 0.5);
   glutSolidCube(0.35);
   glPopMatrix();
-  glMaterialfv(
-      GL_FRONT, GL_DIFFUSE, (float[4]) {
-        0.2;
-        0.2;
-        0.2;
-        0
-      });
+
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.2, 0.2, 0.2, 0});
   glPushMatrix();
   glTranslatef(0.45, -0.1, 0.45);
   glScalef(0.5, 0.5, 0.25);
   glutSolidCube(0.35);
   glPopMatrix();
-  // Último direito
+  // Zadnja desna
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.1, 0.1, 0.1, 0});
   glPushMatrix();
   glTranslatef(-0.45, -0.1, 0.4);
   glScalef(1, 1, 0.5);
   glutSolidCube(0.35);
   glPopMatrix();
-  glMaterialfv(
-      GL_FRONT, GL_DIFFUSE, (float[4]) {
-        0.2;
-        0.2;
-        0.2;
-        0
-      });
+
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.2, 0.2, 0.2, 0});
   glPushMatrix();
   glTranslatef(-0.45, -0.1, 0.45);
   glScalef(0.5, 0.5, 0.25);
   glutSolidCube(0.35);
   glPopMatrix();
-  // Última esquerda
+  // Zadnja leva
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.1, 0.1, 0.1, 0});
   glPushMatrix();
   glTranslatef(-0.45, -0.1, -0.4);
   glScalef(1, 1, 0.5);
   glutSolidCube(0.35);
   glPopMatrix();
-  glMaterialfv(
-      GL_FRONT, GL_DIFFUSE, (float[4]) {
-        0.2;
-        0.2;
-        0.2;
-        0
-      });
+
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.2, 0.2, 0.2, 0});
   glPushMatrix();
   glTranslatef(-0.45, -0.1, -0.45);
   glScalef(0.5, 0.5, 0.25);
   glutSolidCube(0.35);
   glPopMatrix();
-  // Dianteiro esquerdo
+  // Prednja leva
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.1, 0.1, 0.1, 0});
   glPushMatrix();
   glTranslatef(0.45, -0.1, -0.4);
   glScalef(1, 1, 0.5);
   glutSolidCube(0.35);
   glPopMatrix();
-  glMaterialfv(
-      GL_FRONT, GL_DIFFUSE, (float[4]) {
-        0.2;
-        0.2;
-        0.2;
-        0
-      });
+
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.2, 0.2, 0.2, 0});
   glPushMatrix();
   glTranslatef(0.45, -0.1, -0.45);
   glScalef(0.5, 0.5, 0.25);
   glutSolidCube(0.35);
   glPopMatrix();
-  // Parte de cima
+
+  // Gornji deo
   // Konstrukcija
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.9, 0.9, 0.9, 0});
   glPushMatrix();
   glTranslatef(-0.1, 0.4, 0);
-  glScalef(1, 1, 0.5, 0.9);
+  glScalef(1.1, 0.5, 0.9);
   glutSolidCube(0.8);
   glPopMatrix();
   // Prednje staklo
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.0.0.0});
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0, 0, 0, 0});
   glPushMatrix();
   glTranslatef(-0.09, 0.4, 0);
-  glScalef(1, 1, 0.3, 0.89);
+  glScalef(1.1, 0.3, 0.89);
   glutSolidCube(0.8);
   glPopMatrix();
-  // Frente do Windows
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.0.0.0});
+  // Prozori prednji
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0, 0, 0, 0});
   glPushMatrix();
   glTranslatef(0.1, 0.4, 0);
   glScalef(0.5, 0.3, 0.91);
   glutSolidCube(0.8);
   glPopMatrix();
-  // Janelas traseiras
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.0.0.0});
+  // Prozori zadnji
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0, 0, 0, 0});
   glPushMatrix();
   glTranslatef(-0.35, 0.4, 0);
   glScalef(0.3, 0.3, 0.91);
   glutSolidCube(0.8);
   glPopMatrix();
-  // Parte inferior
+
+  // Donji deo
+
   // Farovi
   glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.1, 0.1, 0.1, 0});
+
   // Levi far
   glPushMatrix();
   glTranslatef(0.75, 0.05, -0.2);
   glScalef(0.2, 0.15, 0.2);
   glutSolidCube(0.8);
   glPopMatrix();
-  // Farol direito
+
+  // Desni far
   glPushMatrix();
   glTranslatef(0.75, 0.05, 0.2);
   glScalef(0.2, 0.15, 0.2);
   glutSolidCube(0.8);
   glPopMatrix();
+
   if (x % 7 == 0)
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){204.0 / 256, 0.0.0});
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){204.0 / 256, 0, 0, 0});
   else if (x % 7 == 1)
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){1, 1, 0.0});
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){1, 1, 0, 0});
   else if (x % 7 == 2)
     glMaterialfv(GL_FRONT, GL_DIFFUSE,
-                 (float[4]){0.76, 0 / 256, 153, 0 / 256, 0});
+                 (float[4]){0, 76.0 / 256, 153.0 / 256, 0});
   else if (x % 7 == 3)
     glMaterialfv(GL_FRONT, GL_DIFFUSE,
-                 (float[4]){204.0 / 256, 0.102.0 / 256, 0});
+                 (float[4]){204.0 / 256, 0, 102.0 / 256, 0});
   else if (x % 7 == 4)
     glMaterialfv(GL_FRONT, GL_DIFFUSE,
-                 (float[4]){0.153, 0 / 256, 153, 0 / 256, 0});
+                 (float[4]){0, 153.0 / 256, 153.0 / 256, 0});
   else if (x % 7 == 5)
-    glMaterialfv(
-        GL_FRONT, GL_DIFFUSE, (float[4]) {
-          0.2;
-          0.2;
-          0.2;
-          0
-        });
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){0.2, 0.2, 0.2, 0});
   else if (x % 7 == 6)
     glMaterialfv(GL_FRONT, GL_DIFFUSE, (float[4]){1, 1, 1, 0});
+
   // Retrovizori
   glPushMatrix();
   glTranslatef(0.2, 0.13, 0);
-  glScalef(0.2, 0.15, 1, 2);
+  glScalef(0.2, 0.15, 1.2);
   glutSolidCube(0.8);
   glPopMatrix();
+
   // Donja konstrukcija
   glPushMatrix();
   glScalef(2, 0.5, 1);
@@ -788,7 +770,7 @@ void carro(int x, int z) {
   if (position == 21) {
     all_fields[position - 2][z].empty = 1;
   }
-  if (position - 10 == x_curr && z + start_trake_z == 0) {
+  if (position - 10 == x_curr && z + inicio_da_faixa_z == 0) {
     carro_bateu_no_animal = 1;
   }
 }
@@ -827,7 +809,7 @@ void asfalto(int x, int z) {
 
   glPushMatrix();
   glTranslatef(0, 0, -3);
-  glColor3f(64, 0 / 256, 64, 0 / 256, 64, 0 / 256);
+  glColor3f(64.0 / 256, 64.0 / 256, 64.0 / 256);
 
   glBegin(GL_QUADS);
   glVertex3f(x - 10 - 0.5, 0, z - 12 + 0.5);
@@ -854,7 +836,7 @@ void animal() {
   glPushMatrix();
   /* Quando o impacto é 1, o animal bate em uma arvore ou carro e deve ser
    * achatado (por z) */
-  if (stroke == 1) {
+  if (animal_bateu_em_algo == 1) {
     run_time_1 = 0;
     glTranslatef(0, 0, -0.5);
     glScalef(1, 1, 0.2);
@@ -883,7 +865,7 @@ void animal() {
   else if (jump == 'a' && previous_jump == 'w')
     glRotatef(180 + alpha * 90 / pi, 0, 1, 0);
   else if (jump == 'a' && previous_jump == 's')
-    glRotatef(O - alpha * 90 / pi, 0, 1, 0);
+    glRotatef(0 - alpha * 90 / pi, 0, 1, 0);
   else if (jump == 'd' && previous_jump == 'd')
     glRotatef(90, 0, 1, 0);
   else if (jump == 'd' && previous_jump == 'w')
@@ -894,7 +876,7 @@ void animal() {
     glRotatef(0 + alpha * 90 / pi, 0, 1, 0);
   else if (jump == 'w' && previous_jump == 'd')
     glRotatef(90 + alpha * 90 / pi, 0, 1, 0);
-  else if (jump == 'w' e & previous_jump == 'w')
+  else if (jump == 'w' && previous_jump == 'w')
     glRotatef(180, 0, 1, 0);
   else if (jump == 'w' && previous_jump == 's')
     glRotatef(0 - alpha * 180 / pi, 0, 1, 0);
