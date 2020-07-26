@@ -8,12 +8,13 @@ Created on Mon Jan 27 15:49:43 2020
 import glm
 import numpy as np
 import OpenGL.GL as gl
-from cg.shader_programs.ShaderProgram import ShaderProgram
+from shader_programs.ShaderProgram import ShaderProgram
+
 
 class SimpleShaderProgram():
-    
+
     def __init__(self):
-        
+
         VERTEX_SHADER = """
         #version 330
         
@@ -40,7 +41,7 @@ class SimpleShaderProgram():
             frag_tex_coord = tex_coord;
         }
         """
-            
+
         FRAGMENT_SHADER = """
         #version 330
         
@@ -60,78 +61,85 @@ class SimpleShaderProgram():
                 output_color = frag_color;
         }
         """
-        
+
         self.__shaderProgram = ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER)
         self.__shaderProgram.bind()
-        
-        self.__useUniformColorLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "use_uniform_color");
-        self.__uniformColorLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "uniform_color");
-        self.__mvpMatrixLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "mvp_matrix");
-        
+
+        self.__useUniformColorLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "use_uniform_color")
+        self.__uniformColorLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "uniform_color")
+        self.__mvpMatrixLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "mvp_matrix")
+
         identity = glm.mat4()
         color = np.array([1.0, 1.0, 1.0, 1.0], dtype=np.float32)
-        gl.glUniformMatrix4fv(self.__mvpMatrixLoc, 1, gl.GL_FALSE, glm.value_ptr(identity))
+        gl.glUniformMatrix4fv(self.__mvpMatrixLoc, 1,
+                              gl.GL_FALSE, glm.value_ptr(identity))
         gl.glUniform1i(self.__useUniformColorLoc, 0)
-        gl.glUniform4fv(self.__uniformColorLoc, 1, color);
-        
-        self.__texImageLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "tex_image");
-        self.__isTexEnabledLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "is_tex_enabled");
-        
+        gl.glUniform4fv(self.__uniformColorLoc, 1, color)
+
+        self.__texImageLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "tex_image")
+        self.__isTexEnabledLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "is_tex_enabled")
+
         gl.glUniform1i(self.__texImageLoc, 0)
         gl.glUniform1i(self.__isTexEnabledLoc, 0)
-        
+
         self.__shaderProgram.release()
-        
+
     def useUniformColor(self, state):
-        
+
         if(state):
             gl.glUniform1i(self.__useUniformColorLoc, 1)
         else:
             gl.glUniform1i(self.__useUniformColorLoc, 0)
-            
+
     def setUniformColor(self, color):
-        
-        gl.glUniform4fv(self.__uniformColorLoc, 1, color);
-        
+
+        gl.glUniform4fv(self.__uniformColorLoc, 1, color)
+
     def setUniformMVPMatrix(self, mvp_matrix):
-        
-        gl.glUniformMatrix4fv(self.__mvpMatrixLoc, 1, gl.GL_FALSE, glm.value_ptr(mvp_matrix))
-    
+
+        gl.glUniformMatrix4fv(self.__mvpMatrixLoc, 1,
+                              gl.GL_FALSE, glm.value_ptr(mvp_matrix))
+
     def bindTexture2D(self, texture_id):
-    
+
         if(texture_id > 0):
             gl.glUniform1i(self.__isTexEnabledLoc, 1)
             gl.glActiveTexture(gl.GL_TEXTURE0)
             gl.glBindTexture(gl.GL_TEXTURE_2D, texture_id)
-             
+
         else:
             gl.glUniform1i(self.__isTexEnabledLoc, 0)
             gl.glActiveTexture(gl.GL_TEXTURE0)
             gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
-        
+
     def releaseTexture2D(self):
-        
+
         gl.glUniform1i(self.__isTexEnabledLoc, 0)
-             
+
         gl.glActiveTexture(gl.GL_TEXTURE0)
         gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
-        
+
     def bind(self):
-        
+
         self.__shaderProgram.bind()
-        
+
     def release(self):
-        
+
         self.__shaderProgram.release()
-    
+
     def getVertexPositionLoc(self):
-        
+
         return gl.glGetAttribLocation(self.__shaderProgram.getProgramID(), "position")
-    
+
     def getVertexColorLoc(self):
-        
+
         return gl.glGetAttribLocation(self.__shaderProgram.getProgramID(), "color")
-    
+
     def getVertexTextureCoordLoc(self):
-        
+
         return gl.glGetAttribLocation(self.__shaderProgram.getProgramID(), "tex_coord")

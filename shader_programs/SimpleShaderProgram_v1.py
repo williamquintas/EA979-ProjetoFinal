@@ -7,12 +7,13 @@ Created on Mon Jan 27 15:49:43 2020
 
 import numpy as np
 import OpenGL.GL as gl
-from cg.shader_programs.ShaderProgram import ShaderProgram
+from shader_programs.ShaderProgram import ShaderProgram
+
 
 class SimpleShaderProgram():
-    
+
     def __init__(self):
-        
+
         VERTEX_SHADER = """
         #version 330
         
@@ -34,7 +35,7 @@ class SimpleShaderProgram():
                 frag_color = color;
         }
         """
-            
+
         FRAGMENT_SHADER = """
         #version 330
         
@@ -46,43 +47,45 @@ class SimpleShaderProgram():
             output_color = frag_color;
         }
         """
-        
+
         self.__shaderProgram = ShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER)
         self.__shaderProgram.bind()
-        
-        self.__useUniformColorLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "use_uniform_color");
-        self.__uniformColorLoc = gl.glGetUniformLocation(self.__shaderProgram.getProgramID(), "uniform_color");
-        
+
+        self.__useUniformColorLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "use_uniform_color")
+        self.__uniformColorLoc = gl.glGetUniformLocation(
+            self.__shaderProgram.getProgramID(), "uniform_color")
+
         gl.glUniform1i(self.__useUniformColorLoc, 0)
-        
+
         color = np.array([1.0, 1.0, 1.0, 1.0], dtype=np.float32)
-        gl.glUniform4fv(self.__uniformColorLoc, 1, color);
-        
+        gl.glUniform4fv(self.__uniformColorLoc, 1, color)
+
         self.__shaderProgram.release()
-        
+
     def useUniformColor(self, state):
-        
+
         if(state):
             gl.glUniform1i(self.__useUniformColorLoc, 1)
         else:
             gl.glUniform1i(self.__useUniformColorLoc, 0)
-            
+
     def setUniformColor(self, color):
-        
-        gl.glUniform4fv(self.__uniformColorLoc, 1, color);
-        
+
+        gl.glUniform4fv(self.__uniformColorLoc, 1, color)
+
     def bind(self):
-        
+
         self.__shaderProgram.bind()
-        
+
     def release(self):
-        
+
         self.__shaderProgram.release()
-    
+
     def getVertexPositionLoc(self):
-        
+
         return gl.glGetAttribLocation(self.__shaderProgram.getProgramID(), "position")
-    
+
     def getVertexColorLoc(self):
-        
+
         return gl.glGetAttribLocation(self.__shaderProgram.getProgramID(), "color")
