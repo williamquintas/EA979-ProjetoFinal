@@ -73,9 +73,9 @@ def initialization():
     runTime1 = 0
     runTime2 = 0
     t = 0
-    xCurr = 0
-    yCurr = 0.5
-    zCurr = 0
+    xCurrent = 0
+    yCurrent = 0.5
+    zCurrent = 0
     zTime = 0
     zTrackBegin = -12
 
@@ -96,7 +96,7 @@ def onDisplay():
     # configure camera
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(1, 7 - yCurr, 3, 0, 0 - yCurr, -2, 0, 1, 0)
+    gluLookAt(1, 7 - yCurrent, 3, 0, 0 - yCurrent, -2, 0, 1, 0)
     if (fieldsInitialized == 0):
         zTrackBegin = -12 - 3
         fieldsInitialization()
@@ -116,8 +116,11 @@ def onKeyboard(key: str, x: int, y: int):
     return null
 
 
-def onReshape():
-    return null
+def onReshape(width: int, height: int):
+    glViewport(0, 0, width, height)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(60, float(width/height), 1, 100)
 
 
 def main():
