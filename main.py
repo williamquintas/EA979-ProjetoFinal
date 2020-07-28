@@ -172,6 +172,7 @@ def onKeyboard(key: str, x: int, y: int):
     global carHitPlayer
     global crashedInSomething
     global fieldsInitialized
+    global fieldsMatrix
     global jump
     global previousJump
     global runTime1
@@ -259,6 +260,7 @@ def onKeyboard(key: str, x: int, y: int):
 
 # the game works like a running machine
 def moveObjects():
+    global fieldsMatrix
     rd.seed()
     maxSize = 10000
     # while the player moves forward, all the objects (cars and streets) are placed back in one field
@@ -295,6 +297,7 @@ def moveObjects():
 
 # random tree size and car position settings
 def fieldsInitialization():
+    global fieldsMatrix
     rd.seed()
     maxSize = 10000
 
@@ -330,6 +333,7 @@ def configureIllumination():
 
 
 def renderForest():
+    global fieldsMatrix
     global xCurrent
     global yCurrent
     global zCurrent
@@ -351,6 +355,7 @@ def renderForest():
 
 
 def renderTree(x: int, z: int):
+    global fieldsMatrix
     ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
     specular = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
     brightness = (GLfloat * 1)(0)
@@ -403,6 +408,7 @@ def renderTree(x: int, z: int):
 
 
 def renderTerrain():
+    global fieldsMatrix
     global xCurrent
     global yCurrent
     global zCurrent
@@ -444,6 +450,7 @@ def renderGrass(x, z):
 
 
 def renderStreets():
+    global fieldsMatrix
     global xCurrent
     global yCurrent
     global zCurrent
@@ -469,6 +476,7 @@ def renderStreets():
 
 
 def renderAsphalt(x, z):
+    global fieldsMatrix
     glDisable(GL_LIGHTING)
     glPushMatrix()
     glTranslatef(0, 0, -3)
