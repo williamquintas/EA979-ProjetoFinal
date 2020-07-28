@@ -358,6 +358,7 @@ def renderTree(x: int, z: int):
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
     glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
 
+    # tree top
     glPushMatrix()
     glTranslatef(x, 0, z)
     glScalef(0.8, 0.8, 0.8)
@@ -391,6 +392,7 @@ def renderTree(x: int, z: int):
     glutSolidCube(1)
     glPopMatrix()
 
+    # tree body
     glColor3f(51.0 / 256, 25.0 / 256, 0)
     glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(51.0 / 256, 25.0 / 256, 0.0))
     glPushMatrix()
@@ -401,11 +403,44 @@ def renderTree(x: int, z: int):
 
 
 def renderTerrain():
-    return None
+    global xCurrent
+    global yCurrent
+    global zCurrent
+    glPushMatrix()
+    glTranslatef(-xCurrent, -yCurrent, -zCurrent)
+    for i in range(0, 20):
+        for j in range(0, 20):
+            if fieldsMatrix[i][j].getForestOrStreet() != 'street':
+                renderGrass(i, j)
+
+    for i in range(-10, 0):
+        for j in range(0, 20):
+            if fieldsMatrix[i + 15][j].getForestOrStreet() != 'street':
+                renderGrass(i, j)
+
+    for i in range(20, 30):
+        for j in range(0, 20):
+            if fieldsMatrix[i - 15][j].getForestOrStreet() != 'street':
+                renderGrass(i, j)
+    glPopMatrix()
 
 
-def renderGrass():
-    return None
+def renderGrass(x, z):
+    glPushMatrix()
+    glTranslatef(0, 0, -3)
+    glDisable(GL_LIGHTING)
+    if (x % 2 == 1):
+        glColor3f(178.0 / 256, 255.0 / 256, 102.0 / 256)
+    else:
+        glColor3f(166.0 / 256, 245.0 / 256, 92.0 / 256)
+    glBegin(GL_QUADS)
+    glVertex3f(x - 10 - 0.5, 0, z - 12 + 0.5)
+    glVertex3f(x - 10 - 0.5, 0, z - 12 - 0.5)
+    glVertex3f(x - 10 + 0.5, 0, z - 12 - 0.5)
+    glVertex3f(x - 10 + 0.5, 0, z - 12 + 0.5)
+    glEnd()
+    glEnable(GL_LIGHTING)
+    glPopMatrix()
 
 
 def renderStreets():
