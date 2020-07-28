@@ -166,8 +166,40 @@ def onDisplay():
     glutSwapBuffers()
 
 
+# the game works like a running machine
 def moveObjects():
-    return None
+    rd.seed()
+    maxSize = 10000
+    # while the player moves forward, all the objects (cars and streets) are placed back in one field
+    # and another field is created in the end of the field
+    if jump == 'w':
+        for j in range(18, 0, -1):
+            for i in range(0, 20):
+                fieldsMatrix[i][j+1].setEmpty(fieldsMatrix[i][j].getEmpty())
+                fieldsMatrix[i][j+1].setTreeOrStreet(fieldsMatrix[i][j].getTreeOrStreet())
+                fieldsMatrix[i][j+1].setCarPosition(fieldsMatrix[i][j].getCarPosition())
+                fieldsMatrix[i][j + 1].setTreeHeight(fieldsMatrix[i][j].getTreeHeight())
+        for j in range(0, 20):
+            fieldsMatrix[j][0].setEmpty(1)
+            if fieldsMatrix[j][1].getTreeOrStreet() == 'street' and fieldsMatrix[j][2].getTreeOrStreet() == 'street':
+                fieldsMatrix[j][0].getTreeOrStreet() == 'tree'
+            else:
+                fieldsMatrix[j][0].getTreeOrStreet() == 'street'
+        for i in range(0, 20):
+            if rd.randint(0, maxSize) / maxSize > 0.7 and fieldsMatrix[i][0].getTreeOrStreet() == 'tree':
+                fieldsMatrix[i][0].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
+                fieldsMatrix[i][0].setEmpty(0)
+            else:
+                fieldsMatrix[i][0].setEmpty(1)
+            fieldsMatrix[i][0].setCarPosition(rd.randint(0, maxSize) / maxSize * 8 + 10 * i + 10 * t)
+    # if the player moves backward, all the objects are moved forward in one field
+    elif jump == 's':
+        for j in range(0, 20):
+            for i in range(0, 20):
+                fieldsMatrix[i][j - 1].setEmpty(fieldsMatrix[i][j].getEmpty())
+                fieldsMatrix[i][j - 1].setTreeOrStreet(fieldsMatrix[i][j].getTreeOrStreet())
+                fieldsMatrix[i][j - 1].setCarPosition(fieldsMatrix[i][j].getCarPosition())
+                fieldsMatrix[i][j - 1].setTreeHeight(fieldsMatrix[i][j].getTreeHeight())
 
 
 def fieldsInitialization():
@@ -185,13 +217,11 @@ def fieldsInitialization():
 
             if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getTreeOrStreet() == 'tree'):
                 fieldsMatrix[x][y].setEmpty(0)
-                fieldsMatrix[x][y].setTreeHeight(
-                    mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
+                fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
             else:
                 fieldsMatrix[x][y].setEmpty(1)
 
-            fieldsMatrix[x][y].setCarPosition(
-                rd.randint(0, maxsize) / maxsize * 8 + 10 * x)
+            fieldsMatrix[x][y].setCarPosition(rd.randint(0, maxsize) / maxsize * 8 + 10 * x)
 
 
 def onKeyboard(key: str, x: int, y: int):
