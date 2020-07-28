@@ -1,9 +1,8 @@
+import math as mt
+import random as rd
 import sys
 
 import numpy as np
-import random as rd
-import math as mt
-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -11,13 +10,13 @@ from OpenGL.GLUT import *
 
 class Field():
     def __init__(self):
-        self.forestOrStreet = None
+        self.treeOrStreet = None
         self.empty = None
         self.carPosition = None
         self.treeHeight = None
 
-    def getForestOrStreet(self):
-        return self.forestOrStreet
+    def getTreeOrStreet(self):
+        return self.treeOrStreet
 
     def getEmpty(self):
         return self.empty
@@ -28,8 +27,8 @@ class Field():
     def getTreeHeight(self):
         return self.treeHeight
 
-    def setForestOrStreet(self, value):
-        self.forestOrStreet = value
+    def setTreeOrStreet(self, value):
+        self.treeOrStreet = value
 
     def setEmpty(self, value):
         self.empty = value
@@ -83,14 +82,23 @@ zTime = 0
 zTrackBegin = -12
 
 
-# car start timer
+# timer used to move the cars
 def onTimer1(value: int):
-    return None
+    global t
+    global runTime1
+    if value != 0:
+        return
+    t += 0.01
+    glutPostRedisplay()
+    if (runTime1 == 1) {
+        glutTimerFunc(10, onTimer1, 0)
+    }
 
 
 # player jump timer
 def onTimer2(value: int):
     return None
+
 
 def onDisplay():
     global yCurrent
@@ -116,29 +124,32 @@ def onDisplay():
     # renderPlayer()
 
     glutSwapBuffers()
-    
+
+
 def fieldsInitialization():
     rd.seed()
     maxsize = 10000
-    
+
     for x in range(0, 20):
         for y in range(0, 20):
             if (y > 5):
-                fieldsMatrix[x][y].setForestOrStreet('s')
+                fieldsMatrix[x][y].setTreeOrStreet('tree')
             elif (y % 3 == 0):
-                fieldsMatrix[x][y].setForestOrStreet('s')
-            else: 
-                fieldsMatrix[x][y].setForestOrStreet('u')
-      
-            if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getForestOrStreet() == 's'):
+                fieldsMatrix[x][y].setTreeOrStreet('tree')
+            else:
+                fieldsMatrix[x][y].setTreeOrStreet('street')
+
+            if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getTreeOrStreet() == 'tree'):
                 fieldsMatrix[x][y].setEmpty(0)
-                fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
+                fieldsMatrix[x][y].setTreeHeight(
+                    mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
             else:
                 fieldsMatrix[x][y].setEmpty(1)
-      
-            fieldsMatrix[x][y].setCarPosition(rd.randint(0, maxsize) / maxsize * 8 + 10 * x)
-        
-        
+
+            fieldsMatrix[x][y].setCarPosition(
+                rd.randint(0, maxsize) / maxsize * 8 + 10 * x)
+
+
 def onKeyboard(key: str, x: int, y: int):
     global alpha
     global beginAnimation
@@ -162,10 +173,8 @@ def onKeyboard(key: str, x: int, y: int):
     keycode = ord(key)
     key = key.decode('utf-8')
     if keycode == 27:
-        # glutDestroyWindow()
         sys.exit()
     elif key == 'w':  # moves forward
-        print('in w')
         if (fieldsMatrix[xCurrent + 10][-zTrackBegin - 1].getEmpty() == 1) and beginAnimation == 1 and runTime2 == 0:
             alpha = 0
             jump = 'w'
