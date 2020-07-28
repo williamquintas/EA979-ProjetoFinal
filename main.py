@@ -530,8 +530,167 @@ def renderAsphalt(x, z):
     glEnable(GL_LIGHTING)
 
 
-def renderCar():
-    return None
+def renderCar(x, z):
+    global carHitPlayer
+    global fieldsMatrix
+    global t
+    global zTrackBegin
+
+    glPushMatrix()
+    glColor3f(1, 1, 0)
+    glTranslatef(-10 + t * 10 - x, 0.3, z + zTrackBegin)
+
+    # Pneus e rodas
+    # Frente direita
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.1, 0.1, 0.1, 0))
+    glPushMatrix()
+    glTranslatef(0.45, -0.1, 0.4)
+    glScalef(1, 1, 0.5)
+    glutSolidCube(0.35)
+    glPopMatrix()
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.2, 0.2, 0.2, 0))
+    glPushMatrix()
+    glTranslatef(0.45, -0.1, 0.45)
+    glScalef(0.5, 0.5, 0.25)
+    glutSolidCube(0.35)
+    glPopMatrix()
+    # Traseira direita
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.1, 0.1, 0.1, 0))
+    glPushMatrix()
+    glTranslatef(-0.45, -0.1, 0.4)
+    glScalef(1, 1, 0.5)
+    glutSolidCube(0.35)
+    glPopMatrix()
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.2, 0.2, 0.2, 0))
+    glPushMatrix()
+    glTranslatef(-0.45, -0.1, 0.45)
+    glScalef(0.5, 0.5, 0.25)
+    glutSolidCube(0.35)
+    glPopMatrix()
+    # Traseira esquerda
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.1, 0.1, 0.1, 0))
+    glPushMatrix()
+    glTranslatef(-0.45, -0.1, -0.4)
+    glScalef(1, 1, 0.5)
+    glutSolidCube(0.35)
+    glPopMatrix()
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.2, 0.2, 0.2, 0))
+    glPushMatrix()
+    glTranslatef(-0.45, -0.1, -0.45)
+    glScalef(0.5, 0.5, 0.25)
+    glutSolidCube(0.35)
+    glPopMatrix()
+    # Frente esquerda
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.1, 0.1, 0.1, 0))
+    glPushMatrix()
+    glTranslatef(0.45, -0.1, -0.4)
+    glScalef(1, 1, 0.5)
+    glutSolidCube(0.35)
+    glPopMatrix()
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.2, 0.2, 0.2, 0))
+    glPushMatrix()
+    glTranslatef(0.45, -0.1, -0.45)
+    glScalef(0.5, 0.5, 0.25)
+    glutSolidCube(0.35)
+    glPopMatrix()
+    # Parte superior
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.9, 0.9, 0.9, 0))
+    glPushMatrix()
+    glTranslatef(-0.1, 0.4, 0)
+    glScalef(1.1, 0.5, 0.9)
+    glutSolidCube(0.8)
+    glPopMatrix()
+    # Párabrisa
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 0, 0, 0))
+    glPushMatrix()
+    glTranslatef(-0.09, 0.4, 0)
+    glScalef(1.1, 0.3, 0.89)
+    glutSolidCube(0.8)
+    glPopMatrix()
+    # Janelas frontais
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 0, 0, 0))
+    glPushMatrix()
+    glTranslatef(0.1, 0.4, 0)
+    glScalef(0.5, 0.3, 0.91)
+    glutSolidCube(0.8)
+    glPopMatrix()
+    # Janelas traseiras
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 0, 0, 0))
+    glPushMatrix()
+    glTranslatef(-0.35, 0.4, 0)
+    glScalef(0.3, 0.3, 0.91)
+    glutSolidCube(0.8)
+    glPopMatrix()
+    # Parte de baixo
+    # Faróis
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.1, 0.1, 0.1, 0))
+    # Farol esquerdo
+    glPushMatrix()
+    glTranslatef(0.75, 0.05, -0.2)
+    glScalef(0.2, 0.15, 0.2)
+    glutSolidCube(0.8)
+    glPopMatrix()
+    # Farol direito
+    glPushMatrix()
+    glTranslatef(0.75, 0.05, 0.2)
+    glScalef(0.2, 0.15, 0.2)
+    glutSolidCube(0.8)
+    glPopMatrix()
+
+    if (x % 7 == 0):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(204.0 / 256, 0, 0, 0))
+    elif (x % 7 == 1):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 0, 0))
+    elif (x % 7 == 2):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 76.0 / 256, 153.0 / 256, 0))
+    elif (x % 7 == 3):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(204.0 / 256, 0, 102.0 / 256, 0))
+    elif (x % 7 == 4):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 153.0 / 256, 153.0 / 256, 0))
+    elif (x % 7 == 5):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.2, 0.2, 0.2, 0))
+    elif (x % 7 == 6):
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
+
+    # Retrovisores
+    glPushMatrix()
+    glTranslatef(0.2, 0.13, 0)
+    glScalef(0.2, 0.15, 1.2)
+    glutSolidCube(0.8)
+    glPopMatrix()
+
+    glPushMatrix()
+    glScalef(2, 0.5, 1)
+    glutSolidCube(0.8)
+    glPopMatrix()
+    glPopMatrix()
+
+    position = np.ceil(t * 10 - x)
+    if (position == 0 or position == 1):
+        fieldsMatrix[position][z].setEmpty(0)
+
+    if (position > 1 and position < 19):
+        fieldsMatrix[position][z].setEmpty(0)
+        fieldsMatrix[position - 1][z].setEmpty(0)
+        fieldsMatrix[position - 2][z].setEmpty(1)
+        fieldsMatrix[position + 1][z].setEmpty(1)
+
+    if (position == 19):
+        fieldsMatrix[position][z].setEmpty(0)
+        fieldsMatrix[position - 2][z].setEmpty(1)
+
+    if (position == 20):
+        fieldsMatrix[position - 2][z].setEmpty(1)
+
+    if (position == 21):
+        fieldsMatrix[position - 2][z].setEmpty(1)
+
+    if (position - 10 == x_curr and z + zTrackBegin == 0):
+        carHitPlayer = 1
 
 
 def renderPlayer():
