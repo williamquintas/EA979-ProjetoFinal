@@ -319,7 +319,16 @@ def fieldsInitialization():
 
 
 def configureIllumination():
-    return None
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    position = (GLfloat * 4)(7, 7, 7, 0)
+    ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+    diffuse = (GLfloat * 4)(0.7, 0.7, 0.7, 1)
+    specular = (GLfloat * 4)(0.9, 0.9, 0.9, 1)
+    glLightfv(GL_LIGHT0, GL_POSITION, position)
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse)
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
 
 
 def renderTerrain():
