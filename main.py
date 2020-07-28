@@ -10,13 +10,13 @@ from OpenGL.GLUT import *
 
 class Field():
     def __init__(self):
-        self.treeOrStreet = None
+        self.forestOrStreet = None
         self.empty = None
         self.carPosition = None
         self.treeHeight = None
 
-    def getTreeOrStreet(self):
-        return self.treeOrStreet
+    def getForestOrStreet(self):
+        return self.forestOrStreet
 
     def getEmpty(self):
         return self.empty
@@ -27,8 +27,8 @@ class Field():
     def getTreeHeight(self):
         return self.treeHeight
 
-    def setTreeOrStreet(self, value):
-        self.treeOrStreet = value
+    def setForestOrStreet(self, value):
+        self.forestOrStreet = value
 
     def setEmpty(self, value):
         self.empty = value
@@ -158,8 +158,8 @@ def onDisplay():
         fieldsMatrix[10][-zTrackBegin].setEmpty(1)
 
     configureIllumination()
+    renderForest()
     renderTerrain()
-    defineTreesPosition()
     renderStreets()
     renderPlayer()
 
@@ -256,9 +256,8 @@ def onKeyboard(key: str, x: int, y: int):
         zTime = 0
         glutPostRedisplay()
 
+
 # the game works like a running machine
-
-
 def moveObjects():
     rd.seed()
     maxSize = 10000
@@ -268,17 +267,17 @@ def moveObjects():
         for j in range(18, 0, -1):
             for i in range(0, 20):
                 fieldsMatrix[i][j+1].setEmpty(fieldsMatrix[i][j].getEmpty())
-                fieldsMatrix[i][j+1].setTreeOrStreet(fieldsMatrix[i][j].getTreeOrStreet())
+                fieldsMatrix[i][j+1].setForestOrStreet(fieldsMatrix[i][j].getForestOrStreet())
                 fieldsMatrix[i][j+1].setCarPosition(fieldsMatrix[i][j].getCarPosition())
                 fieldsMatrix[i][j + 1].setTreeHeight(fieldsMatrix[i][j].getTreeHeight())
         for j in range(0, 20):
             fieldsMatrix[j][0].setEmpty(1)
-            if fieldsMatrix[j][1].getTreeOrStreet() == 'street' and fieldsMatrix[j][2].getTreeOrStreet() == 'street':
-                fieldsMatrix[j][0].getTreeOrStreet() == 'tree'
+            if fieldsMatrix[j][1].getForestOrStreet() == 'street' and fieldsMatrix[j][2].getForestOrStreet() == 'street':
+                fieldsMatrix[j][0].getForestOrStreet() == 'forest'
             else:
-                fieldsMatrix[j][0].getTreeOrStreet() == 'street'
+                fieldsMatrix[j][0].getForestOrStreet() == 'street'
         for i in range(0, 20):
-            if rd.randint(0, maxSize) / maxSize > 0.7 and fieldsMatrix[i][0].getTreeOrStreet() == 'tree':
+            if rd.randint(0, maxSize) / maxSize > 0.7 and fieldsMatrix[i][0].getForestOrStreet() == 'forest':
                 fieldsMatrix[i][0].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
                 fieldsMatrix[i][0].setEmpty(0)
             else:
@@ -289,13 +288,12 @@ def moveObjects():
         for j in range(0, 20):
             for i in range(0, 20):
                 fieldsMatrix[i][j - 1].setEmpty(fieldsMatrix[i][j].getEmpty())
-                fieldsMatrix[i][j - 1].setTreeOrStreet(fieldsMatrix[i][j].getTreeOrStreet())
+                fieldsMatrix[i][j - 1].setForestOrStreet(fieldsMatrix[i][j].getForestOrStreet())
                 fieldsMatrix[i][j - 1].setCarPosition(fieldsMatrix[i][j].getCarPosition())
                 fieldsMatrix[i][j - 1].setTreeHeight(fieldsMatrix[i][j].getTreeHeight())
 
+
 # random tree size and car position settings
-
-
 def fieldsInitialization():
     rd.seed()
     maxsize = 10000
@@ -303,13 +301,13 @@ def fieldsInitialization():
     for x in range(0, 20):
         for y in range(0, 20):
             if (y > 5):
-                fieldsMatrix[x][y].setTreeOrStreet('tree')
+                fieldsMatrix[x][y].setForestOrStreet('forest')
             elif (y % 3 == 0):
-                fieldsMatrix[x][y].setTreeOrStreet('tree')
+                fieldsMatrix[x][y].setForestOrStreet('forest')
             else:
-                fieldsMatrix[x][y].setTreeOrStreet('street')
+                fieldsMatrix[x][y].setForestOrStreet('street')
 
-            if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getTreeOrStreet() == 'tree'):
+            if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getForestOrStreet() == 'forest'):
                 fieldsMatrix[x][y].setEmpty(0)
                 fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
             else:
@@ -331,15 +329,94 @@ def configureIllumination():
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
 
 
+def renderForest():
+    global xCurrent
+    global yCurrent
+    global zCurrent
+    global zTrackBegin
+
+    glPushMatrix()
+    glTranslatef(-xCurrent, -yCurrent, -zCurrent)
+    for i in range(0, 20):
+        for j in range(0, 20):
+            if fieldsMatrix[i][j].getEmpty() == 0 and fieldsMatrix[i][j].getForestOrStreet() == 'forest':
+                renderTree(i - 10, zTrackBegin + j)
+    for j in range(0, 20):
+        if fieldsMatrix[0+1][j].getForestOrStreet() == 'forest':
+            renderTree(0 - 10 - 1, zTrackBegin + j)
+    for j in range(0, 20):
+        if fieldsMatrix[20-1][j].getForestOrStreet() == 'forest':
+            renderTree(20-10, zTrackBegin + j)
+    glPopMatrix()
+
+
+def renderTree(x: int, z: int):
+    ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+    specular = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+    brightness = (GLfloat * 1)(0)
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
+    glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
+
+    glPushMatrix()
+    glTranslatef(x, 0, z)
+    glScalef(0.8, 0.8, 0.8)
+
+    if (x > -11 and x < 10):
+        aux = fieldsMatrix[x + 10][z - zTrackBegin].getTreeHeight()
+    else:
+        aux = 3
+
+    for i in range(0, aux):
+        glColor3f(51.0 / 256, 102.0 / 256, 0)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(51.0 / 256, 102.0 / 256, 0, 0))
+        glPushMatrix()
+        glTranslatef(0, 0.5 + 0.2 + 0.6 + i * 0.7, 0)
+        glScalef(1, 0.2, 1)
+        glutSolidCube(1)
+        glPopMatrix()
+        glColor3f(76.0 / 256, 153.0 / 256, 0)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(76.0 / 256, 153.0 / 256, 0, 0))
+        glPushMatrix()
+        glTranslatef(0, 0.5 + 0.2 + 0.25 + i * 0.7, 0)
+        glScalef(1, 0.5, 1)
+        glutSolidCube(1)
+        glPopMatrix()
+
+    glColor3f(51.0 / 256, 102.0 / 256, 0)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(51.0 / 256, 102.0 / 256, 0.0))
+    glPushMatrix()
+    glTranslatef(0, 0.5 + 0.1, 0)
+    glScalef(1, 0.2, 1)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    glColor3f(51.0 / 256, 25.0 / 256, 0)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(51.0 / 256, 25.0 / 256, 0.0))
+    glPushMatrix()
+    glScalef(0.5, 1, 0.5)
+    glutSolidCube(1)
+    glPopMatrix()
+    glPopMatrix()
+
+
 def renderTerrain():
     return None
 
 
-def defineTreesPosition():
+def renderGrass():
     return None
 
 
 def renderStreets():
+    return None
+
+
+def renderAsphalt():
+    return None
+
+
+def renderCar():
     return None
 
 
