@@ -444,11 +444,82 @@ def renderGrass(x, z):
 
 
 def renderStreets():
-    return None
+    global xCurrent
+    global yCurrent
+    global zCurrent
+    glPushMatrix()
+    glTranslatef(-xCurrent, -yCurrent, -zCurrent)
+    for i in range(0, 20):
+        for j in range(0, 20):
+            if fieldsMatrix[i][j].getForestOrStreet() == 'street':
+                renderAsphalt(i, j)
+    for i in range(-10, 0):
+        for j in range(0, 20):
+            if fieldsMatrix[i+15][j].getForestOrStreet() == 'street':
+                renderAsphalt(i, j)
+    for i in range(20, 30):
+        for j in range(0, 20):
+            if fieldsMatrix[i-15][j].getForestOrStreet() == 'street':
+                renderAsphalt(i, j)
+    for i in range(0, 20):
+        for j in range(0, 20):
+            if fieldsMatrix[i][j].getForestOrStreet() == 'street':
+                renderCar(fieldsMatrix[i][j].getCarPosition(), j)
+    glPopMatrix()
 
 
-def renderAsphalt():
-    return None
+def renderAsphalt(x, z):
+    glDisable(GL_LIGHTING)
+    glPushMatrix()
+    glTranslatef(0, 0, -3)
+    if (
+        (
+            x >= 0 and
+            x < 20 and
+            fieldsMatrix[x][z + 1].getForestOrStreet() == 'street' and
+            x % 2 == 1
+        ) or (
+            x < 0 and
+            fieldsMatrix[x + 15][z + 1].getForestOrStreet() == 'street' and
+            np.abs(x) % 2 == 1
+        ) or (
+            x >= 20 and
+            fieldsMatrix[x - 15][z + 1].getForestOrStreet() == 'street' and
+            x % 2 == 1
+        )
+    ):
+        glColor3f(1, 1, 1)
+        ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+        specular = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+        brightness = (GLfloat * 1)(0)
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
+        glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
+
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
+
+        glBegin(GL_QUADS)
+        glVertex3f(x - 10 - 0.5, 0.0001, z - 12 + 0.55)
+        glVertex3f(x - 10 - 0.5, 0.0001, z - 12 + 0.45)
+        glVertex3f(x - 10 + 0.5, 0.0001, z - 12 + 0.45)
+        glVertex3f(x - 10 + 0.5, 0.0001, z - 12 + 0.55)
+        glEnd()
+
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(0, 0, -3)
+    glColor3f(64.0 / 256, 64.0 / 256, 64.0 / 256)
+
+    glBegin(GL_QUADS)
+    glVertex3f(x - 10 - 0.5, 0, z - 12 + 0.5)
+    glVertex3f(x - 10 - 0.5, 0, z - 12 - 0.5)
+    glVertex3f(x - 10 + 0.5, 0, z - 12 - 0.5)
+    glVertex3f(x - 10 + 0.5, 0, z - 12 + 0.5)
+    glEnd()
+    glPopMatrix()
+
+    glEnable(GL_LIGHTING)
 
 
 def renderCar():
