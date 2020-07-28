@@ -1,6 +1,9 @@
 import sys
 
 import numpy as np
+import random as rd
+import math as mt
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -89,7 +92,6 @@ def onTimer1(value: int):
 def onTimer2(value: int):
     return None
 
-
 def onDisplay():
     global yCurrent
     global fieldsInitialized
@@ -103,7 +105,7 @@ def onDisplay():
     gluLookAt(1, 7 - yCurrent, 3, 0, 0 - yCurrent, -2, 0, 1, 0)
     if (fieldsInitialized == 0):
         zTrackBegin = -12 - 3
-        # fieldsInitialization()
+        fieldsInitialization()
         fieldsInitialized = 1
         fieldsMatrix[10][-zTrackBegin].setEmpty(1)
 
@@ -114,8 +116,29 @@ def onDisplay():
     # renderPlayer()
 
     glutSwapBuffers()
-
-
+    
+def fieldsInitialization():
+    rd.seed()
+    maxsize = 10000
+    
+    for x in range(0, 20):
+        for y in range(0, 20):
+            if (y > 5):
+                fieldsMatrix[x][y].setForestOrStreet('s')
+            elif (y % 3 == 0):
+                fieldsMatrix[x][y].setForestOrStreet('s')
+            else: 
+                fieldsMatrix[x][y].setForestOrStreet('u')
+      
+            if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getForestOrStreet() == 's'):
+                fieldsMatrix[x][y].setEmpty(0)
+                fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
+            else:
+                fieldsMatrix[x][y].setEmpty(1)
+      
+            fieldsMatrix[x][y].setCarPosition(rd.randint(0, maxsize) / maxsize * 8 + 10 * x)
+        
+        
 def onKeyboard(key: str, x: int, y: int):
     global alpha
     global beginAnimation
