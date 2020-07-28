@@ -106,8 +106,8 @@ def onTimer2(value: int):
     if value != 0:
         return
     alpha += np.pi / 15
-    aux1 = sin(alpha)
-    aux2 = sin(alpha - np.pi / 15)
+    aux1 = np.sin(alpha)
+    aux2 = np.sin(alpha - np.pi / 15)
     if (jump == 'w'):
         zCurrent -= 1.0 / 15
         yCurrent += aux1 - aux2
@@ -278,7 +278,7 @@ def moveObjects():
                 fieldsMatrix[j][0].getForestOrStreet() == 'street'
         for i in range(0, 20):
             if rd.randint(0, maxSize) / maxSize > 0.7 and fieldsMatrix[i][0].getForestOrStreet() == 'forest':
-                fieldsMatrix[i][0].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
+                fieldsMatrix[i][0].setTreeHeight(mt.ceil(rd.randint(0, maxSize) / maxSize * 3))
                 fieldsMatrix[i][0].setEmpty(0)
             else:
                 fieldsMatrix[i][0].setEmpty(1)
@@ -296,7 +296,7 @@ def moveObjects():
 # random tree size and car position settings
 def fieldsInitialization():
     rd.seed()
-    maxsize = 10000
+    maxSize = 10000
 
     for x in range(0, 20):
         for y in range(0, 20):
@@ -307,13 +307,13 @@ def fieldsInitialization():
             else:
                 fieldsMatrix[x][y].setForestOrStreet('street')
 
-            if (rd.randint(0, maxsize) / maxsize > 0.9 and fieldsMatrix[x][y].getForestOrStreet() == 'forest'):
+            if (rd.randint(0, maxSize) / maxSize > 0.9 and fieldsMatrix[x][y].getForestOrStreet() == 'forest'):
                 fieldsMatrix[x][y].setEmpty(0)
-                fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxsize) / maxsize * 3))
+                fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxSize) / maxSize * 3))
             else:
                 fieldsMatrix[x][y].setEmpty(1)
 
-            fieldsMatrix[x][y].setCarPosition(rd.randint(0, maxsize) / maxsize * 8 + 10 * x)
+            fieldsMatrix[x][y].setCarPosition(rd.randint(0, maxSize) / maxSize * 8 + 10 * x)
 
 
 def configureIllumination():
