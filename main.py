@@ -90,14 +90,54 @@ def onTimer1(value: int):
         return
     t += 0.01
     glutPostRedisplay()
-    if (runTime1 == 1) {
+    if (runTime1 == 1):
         glutTimerFunc(10, onTimer1, 0)
-    }
 
 
 # player jump timer
 def onTimer2(value: int):
-    return None
+    global alpha
+    global jump
+    global xCurrent
+    global xPrevious
+    global yCurrent
+    global zCurrent
+
+    if value != 0:
+        return
+    alpha += np.pi / 15
+    aux1 = sin(alpha)
+    aux2 = sin(alpha - np.pi / 15)
+    if (jump == 'w'):
+        zCurrent -= 1.0 / 15
+        yCurrent += aux1 - aux2
+    elif(jump == 'a'):
+        xCurrent -= 1.0 / 15
+        yCurrent += aux1 - aux2
+    elif (jump == 'd'):
+        xCurrent += 1.0 / 15
+        yCurrent += aux1 - aux2
+    elif (jump == 's'):
+        zCurrent += 1.0 / 15
+        yCurrent += aux1 - aux2
+
+    glutPostRedisplay()
+    if alpha < np.pi:
+        glutTimerFunc(1, onTimer2, 0)
+    else:
+        yCurrent = 0.5
+        if (jump == 'a'):
+            xCurrent = xPrevious - 1
+        elif (jump == 'd'):
+            xCurrent = xPrevious + 1
+        elif (jump == 'w'):
+            moveObjects()
+            zCurrent = 0
+        elif (jump == 's'):
+            moveObjects()
+            zCurrent = 0
+
+    runTime2 = 0
 
 
 def onDisplay():
@@ -124,6 +164,10 @@ def onDisplay():
     # renderPlayer()
 
     glutSwapBuffers()
+
+
+def moveObjects():
+    return None
 
 
 def fieldsInitialization():
