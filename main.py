@@ -694,7 +694,179 @@ def renderCar(x, z):
 
 
 def renderPlayer():
-    return None
+    global alpha
+    global beginAnimation
+    global carHitPlayer
+    global crashedInSomething
+    global jump
+    global previousJump
+    global runTime1
+    pi = 3.1415
+    
+    glPushMatrix()
+
+    if (crashedInSomething == 1):
+        runTime1 = 0
+        glTranslatef(0, 0, -0.5)
+        glScalef(1, 1, 0.2)
+    if (previousJump == 'a'):
+        glRotatef(70, 0, 1, 0)
+    
+    if (previousJump == 'd'):
+        glRotatef(-70, 0, 1, 0)
+
+    if (carHitPlayer == 1):
+        beginAnimation = 0
+        runTime1 = 0
+        glTranslatef(0, 0, 0)
+        glScalef(1, 0.2, 1)
+
+    if (jump == 'a' and previousJump == 'a'):
+        glRotatef(-90, 0, 1, 0)
+        
+    elif (jump == 'a' and previousJump == 'd'):
+        glRotatef(90 + alpha * 180 / pi, 0, 1, 0)
+        
+    elif (jump == 'a' and previousJump == 'w'):
+        glRotatef(180 + alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 'a' and previousJump == 's'):
+        glRotatef(0 - alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 'd' and previousJump == 'd'):
+        glRotatef(90, 0, 1, 0)
+        
+    elif (jump == 'd' and previousJump == 'w'):
+        glRotatef(180 - alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 'd' and previousJump == 'a'):
+        glRotatef(-90 - alpha * 180 / pi, 0, 1, 0)
+        
+    elif (jump == 'd' and previousJump == 's'):
+        glRotatef(0 + alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 'w' and previousJump == 'd'):
+        glRotatef(90 + alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 'w' and previousJump == 'w'):
+        glRotatef(180, 0, 1, 0)
+        
+    elif (jump == 'w' and previousJump == 's'):
+        glRotatef(0 - alpha * 180 / pi, 0, 1, 0)
+        
+    elif (jump == 'w' and previousJump == 'a'):
+        glRotatef(-90 - alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 's' and previousJump == 'a'):
+        glRotatef(-90 + alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 's' and previousJump == 'd'):
+        glRotatef(90 - alpha * 90 / pi, 0, 1, 0)
+        
+    elif (jump == 's' and previousJump == 's'):
+        glRotatef(0, 0, 1, 0)
+        
+    elif (jump == 's' and previousJump == 'w'):
+        glRotatef(180 + alpha * 180 / pi, 0, 1, 0)
+
+    glScalef(0.3, 0.3, 0.3)
+
+    ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+    specular = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+    brightness = (GLfloat * 1)(0)
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
+    glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
+    glColor3f(0, 0, 0)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
+
+    # tail
+    glPushMatrix()
+    glTranslatef(0, 0.5, -1.5)
+    glRotatef(-20, 1, 0, 0)
+    glutSolidSphere(0.5, 50, 50)
+    glPopMatrix()
+
+    # left ear
+    glPushMatrix()
+    glTranslatef(0.35, 1.66, 1)
+    glRotatef(-20, 1, 0, 0)
+    glScalef(0.33, 1, 0.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # right ear
+    glPushMatrix()
+    glTranslatef(-0.35, 1.66, 1)
+    glRotatef(-20, 1, 0, 0)
+    glScalef(0.33, 1, 0.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # head
+    glPushMatrix()
+    glTranslatef(0, 0.66, 1.5)
+    glRotatef(15, 1, 0, 0)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # left front leg
+    glPushMatrix()
+    glTranslatef(0.5, -0.25, 1)
+    glRotatef(-10, 1, 0, 0)
+    glScalef(0.33, 0.85, 0.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # right front leg
+    glPushMatrix()
+    glTranslatef(-0.5, -0.25, 1)
+    glRotatef(-10, 1, 0, 0)
+    glScalef(0.33, 0.85, 0.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # left back leg
+    glPushMatrix()
+    glTranslatef(0.75, 0.2, -0.5)
+    glRotatef(-10, 1, 0, 0)
+    glScalef(0.25, 1, 1)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # right back leg
+    glPushMatrix()
+    glTranslatef(-0.75, 0.2, -0.5)
+    glRotatef(-10, 1, 0, 0)
+    glScalef(0.25, 1, 1)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # body
+    glPushMatrix()
+    glTranslatef(0, 0.5, 0)
+    glRotatef(-10, 1, 0, 0)
+    glScalef(1.25, 1, 2.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # left foot
+    glPushMatrix()
+    glTranslatef(0.8, -0.5, -0.25)
+    glRotatef(20, 1, 0, 0)
+    glScalef(0.33, 0.33, 1.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    # right foot
+    glPushMatrix()
+    glTranslatef(-0.8, -0.5, -0.25)
+    glRotatef(20, 1, 0, 0)
+    glScalef(0.33, 0.33, 1.33)
+    glutSolidCube(1)
+    glPopMatrix()
+
+    glPopMatrix()
 
 
 def onReshape(width: int, height: int):
