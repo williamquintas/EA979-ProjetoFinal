@@ -11,33 +11,9 @@ from OpenGL.GLUT import *
 class Field():
     def __init__(self):
         self.forestOrStreet = None
-        self.empty = None
+        self.isEmpty = None
         self.carPosition = None
         self.treeHeight = None
-
-    def getForestOrStreet(self):
-        return self.forestOrStreet
-
-    def getEmpty(self):
-        return self.empty
-
-    def getCarPosition(self):
-        return self.carPosition
-
-    def getTreeHeight(self):
-        return self.treeHeight
-
-    def setForestOrStreet(self, value):
-        self.forestOrStreet = value
-
-    def setEmpty(self, value):
-        self.empty = value
-
-    def setCarPosition(self, value):
-        self.carPosition = value
-
-    def setTreeHeight(self, value):
-        self.treeHeight = value
 
 
 # initializes fields matrix
@@ -45,41 +21,70 @@ fieldsSize = 20
 fieldsMatrix = np.full((fieldsSize, fieldsSize), Field())
 
 
-# declare variables
-global alpha  # player rotation angle
-global beginAnimation  # animation when player jumps control
-global carHitPlayer  # 1 if any car hit the player
-global crashedInSomething  # 1 if the player crashed in something
-global fieldsInitialized  # variable to control the fields are once initialized
-global jump  # stores pressed key to control player direction
-global previousJump  # stores previous pressed key to control player rotation
-global runTime1
-global runTime2
-global t  # time variable for cars movement
-global xCurrent  # player position
-global xPrevious
-global yCurrent
-global yPrevious
-global zCurrent
-global zPrevious
-global zTime
-global zTrackBegin  # terrain starts in z=-12
-# initialize variables
-alpha = 0
-beginAnimation = 1
-carHitPlayer = 0
-crashedInSomething = 0
-fieldsInitialized = 0
-jump = 'w'
-previousJump = 'w'
+# declare and initialize variables
+alpha = 0  # player rotation angle
+beginAnimation = 1  # animation when player jumps control
+carHitPlayer = 0  # 1 if any car hit the player
+crashedInSomething = 0  # 1 if the player crashed in something
+fieldsInitialized = False  # variable to control the fields are once initialized
+jump = 'w'  # stores pressed key to control player direction
+previousJump = 'w'  # stores previous pressed key to control player rotation
 runTime1 = 0
 runTime2 = 0
-t = 0
-xCurrent = 0
+t = 0  # time variable for cars movement
+xCurrent = 0  # player position
 yCurrent = 0.5
 zCurrent = 0
 zTime = 0
-zTrackBegin = -12
+zTrackBegin = -12  # terrain starts in z=-12
+TIMER_1_ID = 0
+TIMER_1_INTERVAL = 10
+TIMER_2_ID = 0
+TIMER_2_INTERVAL = 1
+
+
+def main():
+    # initializes GLUT
+    glutInit()
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
+    # creates the window
+    glutInitWindowSize(1000, 1000)
+    glutInitWindowPosition(0, 0)
+    window = glutCreateWindow("Cross the street")
+    # GLUT callback functions
+    glutDisplayFunc(onDisplay)
+    glutKeyboardFunc(onKeyboard)
+    glutReshapeFunc(onReshape)
+    # Initializes OpenGL
+    glClearColor(1, 1, 1, 0)
+    glEnable(GL_DEPTH_TEST)
+    # Program infinite loop
+    glutMainLoop()
+
+
+def onDisplay():
+    global fieldsInitialized
+    global fieldsMatrix
+    global yCurrent
+    global zTrackBegin
+
+    # delete previous screen content
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    # configure camera
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    gluLookAt(1, 7 - yCurrent, 3, 0, 0 - yCurrent, -2, 0, 1, 0)
+    if (fieldsInitialized == False):
+        zTrackBegin = -12 - 3
+        fieldsInitialization()
+        fieldsInitialized = True
+        fieldsMatrix[10, -zTrackBegin].isEmpty = True
+    configureIllumination()
+    renderForest()
+    renderTerrain()
+    renderStreets()
+    renderPlayer()
+    glutSwapBuffers()
 
 
 # timer used to move the cars
@@ -91,7 +96,7 @@ def onTimer1(value: int):
     t += 0.01
     glutPostRedisplay()
     if (runTime1 == 1):
-        glutTimerFunc(10, onTimer1, 0)
+        glutTimerFunc(TIMER_1_INTERVAL, onTimer1, TIMER_1_ID)
 
 
 # player jump timer
@@ -123,7 +128,7 @@ def onTimer2(value: int):
 
     glutPostRedisplay()
     if alpha < np.pi:
-        glutTimerFunc(1, onTimer2, 0)
+        glutTimerFunc(TIMER_2_INTERVAL, onTimer2, TIMER_2_ID)
     else:
         yCurrent = 0.5
         if (jump == 'a'):
@@ -138,32 +143,6 @@ def onTimer2(value: int):
             zCurrent = 0
 
     runTime2 = 0
-
-
-def onDisplay():
-    global yCurrent
-    global fieldsInitialized
-    global zTrackBegin
-    global fieldsMatrix
-    # delete previous screen content
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    # configure camera
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    gluLookAt(1, 7 - yCurrent, 3, 0, 0 - yCurrent, -2, 0, 1, 0)
-    if (fieldsInitialized == 0):
-        zTrackBegin = -12 - 3
-        fieldsInitialization()
-        fieldsInitialized = 1
-        fieldsMatrix[10][-zTrackBegin].setEmpty(1)
-
-    configureIllumination()
-    renderForest()
-    renderTerrain()
-    renderStreets()
-    renderPlayer()
-
-    glutSwapBuffers()
 
 
 def onKeyboard(key: str, x: int, y: int):
@@ -192,15 +171,15 @@ def onKeyboard(key: str, x: int, y: int):
     if keycode == 27:
         sys.exit()
     elif key == 'w':  # moves forward
-        if (fieldsMatrix[xCurrent + 10][-zTrackBegin - 1].getEmpty() == 1) and beginAnimation == 1 and runTime2 == 0:
+        if (fieldsMatrix[xCurrent + 10, -zTrackBegin - 1].isEmpty == True) and beginAnimation == 1 and runTime2 == 0:
             alpha = 0
             jump = 'w'
             runTime2 = 1
             zPrevious = zCurrent
-            glutTimerFunc(1, onTimer2, 0)
+            glutTimerFunc(TIMER_2_INTERVAL, onTimer2, TIMER_2_ID)
             if runTime1 == 0:
                 runTime1 = 1
-                glutTimerFunc(10, onTimer1, 0)
+                glutTimerFunc(TIMER_1_INTERVAL, onTimer1, TIMER_1_ID)
 
         elif beginAnimation == 1 and runTime2 == 0:
             crashedInSomething = 1
@@ -208,44 +187,44 @@ def onKeyboard(key: str, x: int, y: int):
             glutPostRedisplay()
 
     elif key == 'a':  # moves to left
-        if fieldsMatrix[xCurrent + 9][-zTrackBegin].getEmpty() == 1 and beginAnimation == 1 and runTime2 == 0:
+        if fieldsMatrix[xCurrent + 9, -zTrackBegin].isEmpty == True and beginAnimation == 1 and runTime2 == 0:
             alpha = 0
             jump = 'a'
             runTime2 = 1
             xPrevious = xCurrent
-            glutTimerFunc(1, onTimer2, 0)
+            glutTimerFunc(TIMER_2_INTERVAL, onTimer2, TIMER_2_ID)
             if runTime1 == 0:
                 runTime1 = 1
-                glutTimerFunc(10, onTimer1, 0)
+                glutTimerFunc(TIMER_1_INTERVAL, onTimer1, TIMER_1_ID)
 
     elif key == 'd':  # moves to right
-        if fieldsMatrix[xCurrent + 11][-zTrackBegin].getEmpty() == 1 and beginAnimation == 1 and runTime2 == 0:
+        if fieldsMatrix[xCurrent + 11, -zTrackBegin].isEmpty == True and beginAnimation == 1 and runTime2 == 0:
             alpha = 0
             jump = 'd'
             runTime2 = 1
             xPrevious = xCurrent
-            glutTimerFunc(1, onTimer2, 0)
+            glutTimerFunc(TIMER_2_INTERVAL, onTimer2, TIMER_2_ID)
             if runTime1 == 0:
                 runTime1 = 1
-                glutTimerFunc(10, onTimer1, 0)
+                glutTimerFunc(TIMER_1_INTERVAL, onTimer1, TIMER_1_ID)
 
     elif key == 's':  # moves back
-        if fieldsMatrix[xCurrent + 10][-zTrackBegin + 1].getEmpty() == 1 and beginAnimation == 1 and runTime2 == 0:
+        if fieldsMatrix[xCurrent + 10, -zTrackBegin + 1].isEmpty == True and beginAnimation == 1 and runTime2 == 0:
             alpha = 0
             jump = 's'
             runTime2 = 1
             zPrevious = zCurrent
-            glutTimerFunc(1, onTimer2, 0)
+            glutTimerFunc(TIMER_2_INTERVAL, onTimer2, TIMER_2_ID)
             if runTime1 == 0:
                 runTime1 = 1
-                glutTimerFunc(10, onTimer1, 0)
+                glutTimerFunc(TIMER_1_INTERVAL, onTimer1, TIMER_1_ID)
 
     elif key == 'r':  # reinitialize variables
         alpha = 0
         beginAnimation = 1
         carHitPlayer = 0
         crashedInSomething = 0
-        fieldsInitialized = 0
+        fieldsInitialized = False
         jump = 'w'
         previousJump = 'w'
         runTime1 = 0
@@ -262,61 +241,62 @@ def onKeyboard(key: str, x: int, y: int):
 def moveObjects():
     global fieldsMatrix
     rd.seed()
-    maxSize = 10000
+
     # while the player moves forward, all the objects (cars and streets) are placed back in one field
     # and another field is created in the end of the field
     if jump == 'w':
         for j in range(18, 0, -1):
             for i in range(0, 20):
-                fieldsMatrix[i][j+1].setEmpty(fieldsMatrix[i][j].getEmpty())
-                fieldsMatrix[i][j+1].setForestOrStreet(fieldsMatrix[i][j].getForestOrStreet())
-                fieldsMatrix[i][j+1].setCarPosition(fieldsMatrix[i][j].getCarPosition())
-                fieldsMatrix[i][j + 1].setTreeHeight(fieldsMatrix[i][j].getTreeHeight())
+                fieldsMatrix[i, j+1].isEmpty = fieldsMatrix[i, j].isEmpty
+                fieldsMatrix[i, j+1].forestOrStreet = fieldsMatrix[i, j].forestOrStreet
+                fieldsMatrix[i, j+1].carPosition = fieldsMatrix[i, j].carPosition
+                fieldsMatrix[i, j + 1].treeHeight = fieldsMatrix[i, j].treeHeight
         for j in range(0, 20):
-            fieldsMatrix[j][0].setEmpty(1)
-            if fieldsMatrix[j][1].getForestOrStreet() == 'street' and fieldsMatrix[j][2].getForestOrStreet() == 'street':
-                fieldsMatrix[j][0].getForestOrStreet() == 'forest'
+            fieldsMatrix[j, 0].isEmpty = True
+            if fieldsMatrix[j, 1].forestOrStreet == 'street' and fieldsMatrix[j, 2].forestOrStreet == 'street':
+                fieldsMatrix[j, 0].forestOrStreet == 'forest'
             else:
-                fieldsMatrix[j][0].getForestOrStreet() == 'street'
+                fieldsMatrix[j, 0].forestOrStreet == 'street'
         for i in range(0, 20):
-            if rd.randint(0, maxSize) / maxSize > 0.7 and fieldsMatrix[i][0].getForestOrStreet() == 'forest':
-                fieldsMatrix[i][0].setTreeHeight(mt.ceil(rd.randint(0, maxSize) / maxSize * 3))
-                fieldsMatrix[i][0].setEmpty(0)
+            if rd.random() > 0.7 and fieldsMatrix[i, 0].forestOrStreet == 'forest':
+                fieldsMatrix[i, 0].treeHeight = mt.ceil(rd.random() * 3)
+                fieldsMatrix[i, 0].isEmpty = False
             else:
-                fieldsMatrix[i][0].setEmpty(1)
-            fieldsMatrix[i][0].setCarPosition(rd.randint(0, maxSize) / maxSize * 8 + 10 * i + 10 * t)
+                fieldsMatrix[i, 0].isEmpty = True
+            fieldsMatrix[i, 0].carPosition = rd.random() * 8 + 10 * i + 10 * t
     # if the player moves backward, all the objects are moved forward in one field
     elif jump == 's':
         for j in range(0, 20):
             for i in range(0, 20):
-                fieldsMatrix[i][j - 1].setEmpty(fieldsMatrix[i][j].getEmpty())
-                fieldsMatrix[i][j - 1].setForestOrStreet(fieldsMatrix[i][j].getForestOrStreet())
-                fieldsMatrix[i][j - 1].setCarPosition(fieldsMatrix[i][j].getCarPosition())
-                fieldsMatrix[i][j - 1].setTreeHeight(fieldsMatrix[i][j].getTreeHeight())
+                fieldsMatrix[i, j - 1].isEmpty = fieldsMatrix[i, j].isEmpty
+                fieldsMatrix[i, j - 1].forestOrStreet = fieldsMatrix[i, j].forestOrStreet
+                fieldsMatrix[i, j - 1].carPosition = fieldsMatrix[i, j].carPosition
+                fieldsMatrix[i, j - 1].treeHeight = fieldsMatrix[i, j].treeHeight
 
 
 # random tree size and car position settings
 def fieldsInitialization():
-    global fieldsMatrix
     rd.seed()
-    maxSize = 10000
-
-    for x in range(0, 20):
-        for y in range(0, 20):
-            if (y > 5):
-                fieldsMatrix[x][y].setForestOrStreet('forest')
-            elif (y % 3 == 0):
-                fieldsMatrix[x][y].setForestOrStreet('forest')
+    for i in range(0, 20):
+        global fieldsMatrix
+        for j in range(0, 20):
+            if (j > 5):
+                fieldsMatrix[i, j].forestOrStreet = 'forest'
+            elif (j % 3 == 0):
+                fieldsMatrix[i, j].forestOrStreet = 'forest'
             else:
-                fieldsMatrix[x][y].setForestOrStreet('street')
+                fieldsMatrix[i, j].forestOrStreet = 'street'
+            print(i, j, fieldsMatrix[i, j].forestOrStreet)
 
-            if (rd.randint(0, maxSize) / maxSize > 0.9 and fieldsMatrix[x][y].getForestOrStreet() == 'forest'):
-                fieldsMatrix[x][y].setEmpty(0)
-                fieldsMatrix[x][y].setTreeHeight(mt.ceil(rd.randint(0, maxSize) / maxSize * 3))
+            if (rd.random() > 0.9 and fieldsMatrix[i, j].forestOrStreet == 'forest'):
+                fieldsMatrix[i, j].isEmpty = False
+                fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
             else:
-                fieldsMatrix[x][y].setEmpty(1)
+                fieldsMatrix[i, j].isEmpty = True
 
-            fieldsMatrix[x][y].setCarPosition(rd.randint(0, maxSize) / maxSize * 8 + 10 * x)
+            fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
+        print(i, j, fieldsMatrix[0, 1].forestOrStreet)
+    print(0, 1, fieldsMatrix[0, 1].forestOrStreet)
 
 
 def configureIllumination():
@@ -343,14 +323,15 @@ def renderForest():
     glTranslatef(-xCurrent, -yCurrent, -zCurrent)
     for i in range(0, 20):
         for j in range(0, 20):
-            if fieldsMatrix[i][j].getEmpty() == 0 and fieldsMatrix[i][j].getForestOrStreet() == 'forest':
+            print(fieldsMatrix[i, j].isEmpty, fieldsMatrix[i, j].forestOrStreet)
+            if fieldsMatrix[i, j].isEmpty == False and fieldsMatrix[i, j].forestOrStreet == 'forest':
                 renderTree(i - 10, zTrackBegin + j)
     for j in range(0, 20):
-        if fieldsMatrix[0+1][j].getForestOrStreet() == 'forest':
-            renderTree(0 - 10 - 1, zTrackBegin + j)
+        if fieldsMatrix[1, j].forestOrStreet == 'forest':
+            renderTree(-11, zTrackBegin + j)
     for j in range(0, 20):
-        if fieldsMatrix[20-1][j].getForestOrStreet() == 'forest':
-            renderTree(20-10, zTrackBegin + j)
+        if fieldsMatrix[19, j].forestOrStreet == 'forest':
+            renderTree(10, zTrackBegin + j)
     glPopMatrix()
 
 
@@ -369,7 +350,7 @@ def renderTree(x: int, z: int):
     glScalef(0.8, 0.8, 0.8)
 
     if (x > -11 and x < 10):
-        aux = fieldsMatrix[x + 10][z - zTrackBegin].getTreeHeight()
+        aux = fieldsMatrix[x + 10, z - zTrackBegin].treeHeight
     else:
         aux = 3
 
@@ -416,17 +397,17 @@ def renderTerrain():
     glTranslatef(-xCurrent, -yCurrent, -zCurrent)
     for i in range(0, 20):
         for j in range(0, 20):
-            if fieldsMatrix[i][j].getForestOrStreet() != 'street':
+            if fieldsMatrix[i, j].forestOrStreet != 'street':
                 renderGrass(i, j)
 
     for i in range(-10, 0):
         for j in range(0, 20):
-            if fieldsMatrix[i + 15][j].getForestOrStreet() != 'street':
+            if fieldsMatrix[i + 15, j].forestOrStreet != 'street':
                 renderGrass(i, j)
 
     for i in range(20, 30):
         for j in range(0, 20):
-            if fieldsMatrix[i - 15][j].getForestOrStreet() != 'street':
+            if fieldsMatrix[i - 15, j].forestOrStreet != 'street':
                 renderGrass(i, j)
     glPopMatrix()
 
@@ -458,20 +439,20 @@ def renderStreets():
     glTranslatef(-xCurrent, -yCurrent, -zCurrent)
     for i in range(0, 20):
         for j in range(0, 20):
-            if fieldsMatrix[i][j].getForestOrStreet() == 'street':
+            if fieldsMatrix[i, j].forestOrStreet == 'street':
                 renderAsphalt(i, j)
     for i in range(-10, 0):
         for j in range(0, 20):
-            if fieldsMatrix[i+15][j].getForestOrStreet() == 'street':
+            if fieldsMatrix[i+15, j].forestOrStreet == 'street':
                 renderAsphalt(i, j)
     for i in range(20, 30):
         for j in range(0, 20):
-            if fieldsMatrix[i-15][j].getForestOrStreet() == 'street':
+            if fieldsMatrix[i-15, j].forestOrStreet == 'street':
                 renderAsphalt(i, j)
     for i in range(0, 20):
         for j in range(0, 20):
-            if fieldsMatrix[i][j].getForestOrStreet() == 'street':
-                renderCar(fieldsMatrix[i][j].getCarPosition(), j)
+            if fieldsMatrix[i, j].forestOrStreet == 'street':
+                renderCar(fieldsMatrix[i, j].carPosition, j)
     glPopMatrix()
 
 
@@ -484,15 +465,15 @@ def renderAsphalt(x, z):
         (
             x >= 0 and
             x < 20 and
-            fieldsMatrix[x][z + 1].getForestOrStreet() == 'street' and
+            fieldsMatrix[x, z + 1].forestOrStreet == 'street' and
             x % 2 == 1
         ) or (
             x < 0 and
-            fieldsMatrix[x + 15][z + 1].getForestOrStreet() == 'street' and
+            fieldsMatrix[x + 15, z + 1].forestOrStreet == 'street' and
             np.abs(x) % 2 == 1
         ) or (
             x >= 20 and
-            fieldsMatrix[x - 15][z + 1].getForestOrStreet() == 'street' and
+            fieldsMatrix[x - 15, z + 1].forestOrStreet == 'street' and
             x % 2 == 1
         )
     ):
@@ -671,23 +652,23 @@ def renderCar(x, z):
 
     position = np.ceil(t * 10 - x)
     if (position == 0 or position == 1):
-        fieldsMatrix[position][z].setEmpty(0)
+        fieldsMatrix[position, z].isEmpty = False
 
     if (position > 1 and position < 19):
-        fieldsMatrix[position][z].setEmpty(0)
-        fieldsMatrix[position - 1][z].setEmpty(0)
-        fieldsMatrix[position - 2][z].setEmpty(1)
-        fieldsMatrix[position + 1][z].setEmpty(1)
+        fieldsMatrix[position, z].isEmpty = False
+        fieldsMatrix[position - 1, z].isEmpty = False
+        fieldsMatrix[position - 2, z].isEmpty = True
+        fieldsMatrix[position + 1, z].isEmpty = True
 
     if (position == 19):
-        fieldsMatrix[position][z].setEmpty(0)
-        fieldsMatrix[position - 2][z].setEmpty(1)
+        fieldsMatrix[position, z].isEmpty = False
+        fieldsMatrix[position - 2, z].isEmpty = True
 
     if (position == 20):
-        fieldsMatrix[position - 2][z].setEmpty(1)
+        fieldsMatrix[position - 2, z].isEmpty = True
 
     if (position == 21):
-        fieldsMatrix[position - 2][z].setEmpty(1)
+        fieldsMatrix[position - 2, z].isEmpty = True
 
     if (position - 10 == x_curr and z + zTrackBegin == 0):
         carHitPlayer = 1
@@ -702,7 +683,7 @@ def renderPlayer():
     global previousJump
     global runTime1
     pi = 3.1415
-    
+
     glPushMatrix()
 
     if (crashedInSomething == 1):
@@ -711,7 +692,7 @@ def renderPlayer():
         glScalef(1, 1, 0.2)
     if (previousJump == 'a'):
         glRotatef(70, 0, 1, 0)
-    
+
     if (previousJump == 'd'):
         glRotatef(-70, 0, 1, 0)
 
@@ -723,49 +704,49 @@ def renderPlayer():
 
     if (jump == 'a' and previousJump == 'a'):
         glRotatef(-90, 0, 1, 0)
-        
+
     elif (jump == 'a' and previousJump == 'd'):
         glRotatef(90 + alpha * 180 / pi, 0, 1, 0)
-        
+
     elif (jump == 'a' and previousJump == 'w'):
         glRotatef(180 + alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 'a' and previousJump == 's'):
         glRotatef(0 - alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 'd' and previousJump == 'd'):
         glRotatef(90, 0, 1, 0)
-        
+
     elif (jump == 'd' and previousJump == 'w'):
         glRotatef(180 - alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 'd' and previousJump == 'a'):
         glRotatef(-90 - alpha * 180 / pi, 0, 1, 0)
-        
+
     elif (jump == 'd' and previousJump == 's'):
         glRotatef(0 + alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 'w' and previousJump == 'd'):
         glRotatef(90 + alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 'w' and previousJump == 'w'):
         glRotatef(180, 0, 1, 0)
-        
+
     elif (jump == 'w' and previousJump == 's'):
         glRotatef(0 - alpha * 180 / pi, 0, 1, 0)
-        
+
     elif (jump == 'w' and previousJump == 'a'):
         glRotatef(-90 - alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 's' and previousJump == 'a'):
         glRotatef(-90 + alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 's' and previousJump == 'd'):
         glRotatef(90 - alpha * 90 / pi, 0, 1, 0)
-        
+
     elif (jump == 's' and previousJump == 's'):
         glRotatef(0, 0, 1, 0)
-        
+
     elif (jump == 's' and previousJump == 'w'):
         glRotatef(180 + alpha * 180 / pi, 0, 1, 0)
 
@@ -874,25 +855,6 @@ def onReshape(width: int, height: int):
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     gluPerspective(60, float(width/height), 1, 100)
-
-
-def main():
-    # initializes GLUT
-    glutInit()
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
-    # creates the window
-    glutInitWindowSize(1000, 1000)
-    glutInitWindowPosition(100, 100)
-    window = glutCreateWindow("Cross the street")
-    # GLUT callback functions
-    glutDisplayFunc(onDisplay)
-    glutKeyboardFunc(onKeyboard)
-    glutReshapeFunc(onReshape)
-    # Initializes OpenGL
-    glClearColor(1, 1, 1, 0)
-    glEnable(GL_DEPTH_TEST)
-    # Program infinite loop
-    glutMainLoop()
 
 
 if __name__ == '__main__':
