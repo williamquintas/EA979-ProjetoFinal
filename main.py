@@ -20,7 +20,10 @@ class CrossTheStreet:
     def __init__(self):
         # initializes fields matrix
         fieldsSize = 20
-        self.fieldsMatrix = np.full((fieldsSize, fieldsSize), Field())
+        self.fieldsMatrix = np.empty((fieldsSize, fieldsSize), dtype=Field)
+        for i in range(fieldsSize):
+            for j in range(fieldsSize):
+                self.fieldsMatrix[i, j] = Field()
 
         # declare and initialize variables
         self.alpha = 0  # player rotation angle
@@ -581,7 +584,7 @@ class CrossTheStreet:
         glPopMatrix()
         glPopMatrix()
 
-        position = np.ceil(self.time * 10 - x)
+        position = int(np.ceil(self.time * 10 - x))
         if (position == 0 or position == 1):
             self.fieldsMatrix[position, z].isEmpty = False
 
@@ -601,7 +604,7 @@ class CrossTheStreet:
         if (position == 21):
             self.fieldsMatrix[position - 2, z].isEmpty = True
 
-        if (position - 10 == x_curr and z + self.zTrackBegin == 0):
+        if (position - 10 == self.xCurrent and z + self.zTrackBegin == 0):
             self.carHitPlayer = 1
 
     def renderPlayer(self):
