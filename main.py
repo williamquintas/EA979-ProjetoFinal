@@ -140,8 +140,7 @@ class CrossTheStreet:
         if keycode == 27:
             sys.exit()
         elif key == 'w':  # moves forward
-            self.xCurrent = int(self.xCurrent)
-            if (self.fieldsMatrix[self.xCurrent + 10, -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == 1 and self.runTime2 == 0:
+            if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == 1 and self.runTime2 == 0:
                 self.alpha = 0
                 self.jump = 'w'
                 self.runTime2 = 1
@@ -157,8 +156,7 @@ class CrossTheStreet:
                 glutPostRedisplay()
 
         elif key == 'a':  # moves to left
-            self.xCurrent = int(self.xCurrent)
-            if self.fieldsMatrix[self.xCurrent + 9, -self.zTrackBegin].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
+            if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
                 self.alpha = 0
                 self.jump = 'a'
                 self.runTime2 = 1
@@ -169,8 +167,7 @@ class CrossTheStreet:
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 'd':  # moves to right    
-            self.xCurrent = int(self.xCurrent)
-            if self.fieldsMatrix[self.xCurrent + 11, -self.zTrackBegin].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
+            if self.fieldsMatrix[int(self.xCurrent + 11), -self.zTrackBegin].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
                 self.alpha = 0
                 self.jump = 'd'
                 self.runTime2 = 1
@@ -181,8 +178,7 @@ class CrossTheStreet:
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 's':  # moves back
-            self.xCurrent = int(self.xCurrent)
-            if self.fieldsMatrix[self.xCurrent + 10, -self.zTrackBegin + 1].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
+            if self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin + 1].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
                 self.alpha = 0
                 self.jump = 's'
                 self.runTime2 = 1
