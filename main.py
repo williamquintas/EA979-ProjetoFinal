@@ -150,7 +150,7 @@ class CrossTheStreet:
                     self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
-            elif self.beginAnimation == True and self.isRunningTimer2 == False:
+            elif (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == False and self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].forestOrStreet != 'forest') and self.beginAnimation == True and self.isRunningTimer2 == False:
                 self.crashedInSomething = True
                 self.beginAnimation = False
                 glutPostRedisplay()
@@ -213,11 +213,11 @@ class CrossTheStreet:
         # while the player moves forward, all the objects (cars and streets) are placed back in one field
         # and another field is created in the end of the field
         if self.jump == 'w':
-            for j in range(18, 0, -1):
+            for j in range(18, -1, -1):
                 for i in range(0, 20):
-                    self.fieldsMatrix[i, j+1].isEmpty = self.fieldsMatrix[i, j].isEmpty
-                    self.fieldsMatrix[i, j+1].forestOrStreet = self.fieldsMatrix[i, j].forestOrStreet
-                    self.fieldsMatrix[i, j+1].carPosition = self.fieldsMatrix[i, j].carPosition
+                    self.fieldsMatrix[i, j + 1].isEmpty = self.fieldsMatrix[i, j].isEmpty
+                    self.fieldsMatrix[i, j + 1].forestOrStreet = self.fieldsMatrix[i, j].forestOrStreet
+                    self.fieldsMatrix[i, j + 1].carPosition = self.fieldsMatrix[i, j].carPosition
                     self.fieldsMatrix[i, j + 1].treeHeight = self.fieldsMatrix[i, j].treeHeight
             for j in range(0, 20):
                 self.fieldsMatrix[j, 0].isEmpty = True
@@ -405,15 +405,15 @@ class CrossTheStreet:
             (
                 x >= 0 and
                 x < 20 and
-                self.fieldsMatrix[x, z + 1].forestOrStreet == 'street' and
+                self.fieldsMatrix[x, z].forestOrStreet == 'street' and
                 x % 2 == 1
             ) or (
                 x < 0 and
-                self.fieldsMatrix[x + 15, z + 1].forestOrStreet == 'street' and
+                self.fieldsMatrix[x + 15, z].forestOrStreet == 'street' and
                 np.abs(x) % 2 == 1
             ) or (
                 x >= 20 and
-                self.fieldsMatrix[x - 15, z + 1].forestOrStreet == 'street' and
+                self.fieldsMatrix[x - 15, z].forestOrStreet == 'street' and
                 x % 2 == 1
             )
         ):
@@ -617,11 +617,11 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
-        if (self.previousJump == 'a'):
-            glRotatef(70, 0, 1, 0)
+            if (self.previousJump == 'a'):
+                glRotatef(70, 0, 1, 0)
 
-        if (self.previousJump == 'd'):
-            glRotatef(-70, 0, 1, 0)
+            if (self.previousJump == 'd'):
+                glRotatef(-70, 0, 1, 0)
 
         if (self.carHitPlayer == True):
             self.beginAnimation = False
