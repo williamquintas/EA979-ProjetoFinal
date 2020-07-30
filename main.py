@@ -140,7 +140,7 @@ class CrossTheStreet:
         if keycode == 27:
             sys.exit()
         elif key == 'w':  # moves forward
-            if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == True and self.isRunningTimer2 == False:
+            if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
                 self.jump = 'w'
                 self.isRunningTimer2 = True
@@ -156,7 +156,7 @@ class CrossTheStreet:
                 glutPostRedisplay()
 
         elif key == 'a':  # moves to left
-            if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False:
+            if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
                 self.jump = 'a'
                 self.isRunningTimer2 = True
@@ -167,7 +167,7 @@ class CrossTheStreet:
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 'd':  # moves to right    
-            if self.fieldsMatrix[int(self.xCurrent + 11), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False:
+            if self.fieldsMatrix[int(self.xCurrent + 11), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
                 self.jump = 'd'
                 self.isRunningTimer2 = True
@@ -178,7 +178,7 @@ class CrossTheStreet:
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 's':  # moves back
-            if self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin + 1].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False:
+            if self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin + 1].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
                 self.jump = 's'
                 self.isRunningTimer2 = True
@@ -617,6 +617,7 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
+
             if (self.previousJump == 'a'):
                 glRotatef(70, 0, 1, 0)
 
