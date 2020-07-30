@@ -27,14 +27,14 @@ class CrossTheStreet:
 
         # declare and initialize variables
         self.alpha = 0  # player rotation angle
-        self.beginAnimation = 1  # animation when player jumps control
-        self.carHitPlayer = 0  # 1 if any car hit the player
-        self.crashedInSomething = 0  # 1 if the player crashed in something
+        self.beginAnimation = True  # animation when player jumps control
+        self.carHitPlayer = False  # true if car hits player
+        self.crashedInSomething = False  # true if the player crashed in something
         self.fieldsInitialized = False  # variable to control the fields are once initialized
         self.jump = 'w'  # stores pressed key to control player direction
         self.previousJump = 'w'  # stores previous pressed key to control player rotation
-        self.runTime1 = 0
-        self.runTime2 = 0
+        self.isRunningTimer1 = False
+        self.isRunningTimer2 = False
         self.time = 0  # time variable for cars movement
         self.xCurrent = 0  # player position
         self.yCurrent = 0.5
@@ -90,7 +90,7 @@ class CrossTheStreet:
             return
         self.time += 0.01
         glutPostRedisplay()
-        if (self.runTime1 == 1):
+        if (self.isRunningTimer1 == True):
             glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
     # player jump timer
@@ -131,7 +131,7 @@ class CrossTheStreet:
                 self.moveObjects()
                 self.zCurrent = 0
 
-        self.runTime2 = 0
+        self.isRunningTimer2 = False
 
     def onKeyboard(self, key: str, x: int, y: int):
         self.previousJump = self.jump
@@ -140,64 +140,64 @@ class CrossTheStreet:
         if keycode == 27:
             sys.exit()
         elif key == 'w':  # moves forward
-            if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == 1 and self.runTime2 == 0:
+            if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == True and self.isRunningTimer2 == False:
                 self.alpha = 0
                 self.jump = 'w'
-                self.runTime2 = 1
+                self.isRunningTimer2 = True
                 self.zPrevious = self.zCurrent
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
-                if self.runTime1 == 0:
-                    self.runTime1 = 1
+                if self.isRunningTimer1 == False:
+                    self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
-            elif self.beginAnimation == 1 and self.runTime2 == 0:
-                self.crashedInSomething = 1
-                self.beginAnimation = 0
+            elif self.beginAnimation == True and self.isRunningTimer2 == False:
+                self.crashedInSomething = True
+                self.beginAnimation = False
                 glutPostRedisplay()
 
         elif key == 'a':  # moves to left
-            if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
+            if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False:
                 self.alpha = 0
                 self.jump = 'a'
-                self.runTime2 = 1
+                self.isRunningTimer2 = True
                 self.xPrevious = self.xCurrent
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
-                if self.runTime1 == 0:
-                    self.runTime1 = 1
+                if self.isRunningTimer1 == False:
+                    self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 'd':  # moves to right    
-            if self.fieldsMatrix[int(self.xCurrent + 11), -self.zTrackBegin].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
+            if self.fieldsMatrix[int(self.xCurrent + 11), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False:
                 self.alpha = 0
                 self.jump = 'd'
-                self.runTime2 = 1
+                self.isRunningTimer2 = True
                 self.xPrevious = self.xCurrent
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
-                if self.runTime1 == 0:
-                    self.runTime1 = 1
+                if self.isRunningTimer1 == False:
+                    self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 's':  # moves back
-            if self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin + 1].isEmpty == True and self.beginAnimation == 1 and self.runTime2 == 0:
+            if self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin + 1].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False:
                 self.alpha = 0
                 self.jump = 's'
-                self.runTime2 = 1
+                self.isRunningTimer2 = True
                 self.zPrevious = self.zCurrent
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
-                if self.runTime1 == 0:
-                    self.runTime1 = 1
+                if self.isRunningTimer1 == False:
+                    self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
         elif key == 'r':  # reinitialize variables
             self.alpha = 0
-            self.beginAnimation = 1
-            self.carHitPlayer = 0
-            self.crashedInSomething = 0
+            self.beginAnimation = True
+            self.carHitPlayer = False
+            self.crashedInSomething = False
             self.fieldsInitialized = False
             self.jump = 'w'
             self.previousJump = 'w'
-            self.runTime1 = 0
-            self.runTime2 = 0
+            self.isRunningTimer1 = False
+            self.isRunningTimer2 = False
             self.time = 0
             self.xCurrent = 0
             self.yCurrent = 0.5
@@ -606,15 +606,15 @@ class CrossTheStreet:
             self.fieldsMatrix[position - 2, z].isEmpty = True
 
         if (position - 10 == self.xCurrent and z + self.zTrackBegin == 0):
-            self.carHitPlayer = 1
+            self.carHitPlayer = True
 
     def renderPlayer(self):
         pi = 3.1415
 
         glPushMatrix()
 
-        if (self.crashedInSomething == 1):
-            self.runTime1 = 0
+        if (self.crashedInSomething == True):
+            self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
         if (self.previousJump == 'a'):
@@ -623,9 +623,9 @@ class CrossTheStreet:
         if (self.previousJump == 'd'):
             glRotatef(-70, 0, 1, 0)
 
-        if (self.carHitPlayer == 1):
-            self.beginAnimation = 0
-            self.runTime1 = 0
+        if (self.carHitPlayer == True):
+            self.beginAnimation = False
+            self.isRunningTimer1 = False
             glTranslatef(0, 0, 0)
             glScalef(1, 0.2, 1)
 
