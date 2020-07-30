@@ -677,101 +677,66 @@ class CrossTheStreet:
         elif (self.jump == 's' and self.previousJump == 'w'):
             glRotatef(180 + self.alpha * 180 / pi, 0, 1, 0)
 
-        glScalef(0.3, 0.3, 0.3)
+        glScalef(0.25, 0.25, 0.25)
 
         ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
         specular = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
-        brightness = (GLfloat * 1)(0)
+        brightness = (GLfloat * 1)(0.0)
         glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
         glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
-        glColor3f(0, 0, 0)
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
-
-        # tail
-        glPushMatrix()
-        glTranslatef(0, 0.5, -1.5)
-        glRotatef(-20, 1, 0, 0)
-        glutSolidSphere(0.5, 50, 50)
-        glPopMatrix()
-
-        # left ear
-        glPushMatrix()
-        glTranslatef(0.35, 1.66, 1)
-        glRotatef(-20, 1, 0, 0)
-        glScalef(0.33, 1, 0.33)
-        glutSolidCube(1)
-        glPopMatrix()
-
-        # right ear
-        glPushMatrix()
-        glTranslatef(-0.35, 1.66, 1)
-        glRotatef(-20, 1, 0, 0)
-        glScalef(0.33, 1, 0.33)
-        glutSolidCube(1)
-        glPopMatrix()
-
-        # head
-        glPushMatrix()
-        glTranslatef(0, 0.66, 1.5)
-        glRotatef(15, 1, 0, 0)
-        glutSolidCube(1)
-        glPopMatrix()
-
-        # left front leg
-        glPushMatrix()
-        glTranslatef(0.5, -0.25, 1)
-        glRotatef(-10, 1, 0, 0)
-        glScalef(0.33, 0.85, 0.33)
-        glutSolidCube(1)
-        glPopMatrix()
-
-        # right front leg
-        glPushMatrix()
-        glTranslatef(-0.5, -0.25, 1)
-        glRotatef(-10, 1, 0, 0)
-        glScalef(0.33, 0.85, 0.33)
-        glutSolidCube(1)
-        glPopMatrix()
-
-        # left back leg
-        glPushMatrix()
-        glTranslatef(0.75, 0.2, -0.5)
-        glRotatef(-10, 1, 0, 0)
-        glScalef(0.25, 1, 1)
-        glutSolidCube(1)
-        glPopMatrix()
-
-        # right back leg
-        glPushMatrix()
-        glTranslatef(-0.75, 0.2, -0.5)
-        glRotatef(-10, 1, 0, 0)
-        glScalef(0.25, 1, 1)
-        glutSolidCube(1)
-        glPopMatrix()
-
+        
         # body
         glPushMatrix()
-        glTranslatef(0, 0.5, 0)
-        glRotatef(-10, 1, 0, 0)
-        glScalef(1.25, 1, 2.33)
-        glutSolidCube(1)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.60, 0.40, 0.12))
+        glTranslatef(0.0, 0.0, 0.0)
+        glScaled(1.25, 1, 1.25)
+        glutSolidCube(1.5)
         glPopMatrix()
 
-        # left foot
+        # neck
         glPushMatrix()
-        glTranslatef(0.8, -0.5, -0.25)
-        glRotatef(20, 1, 0, 0)
-        glScalef(0.33, 0.33, 1.33)
-        glutSolidCube(1)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.60, 0.40, 0.12))
+        glTranslatef(0.0, 2.0, 0.0)
+        glRotated(90, 0, 1, 0)
+        glScaled(0.9, 3.0, 0.9)
+        glutSolidCube(1.5)
         glPopMatrix()
 
-        # right foot
+        # right wing
         glPushMatrix()
-        glTranslatef(-0.8, -0.5, -0.25)
-        glRotatef(20, 1, 0, 0)
-        glScalef(0.33, 0.33, 1.33)
-        glutSolidCube(1)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.60, 0.40, 0.12))
+        glTranslatef(-1.0, 0.0, 0.0)
+        glRotated(90, 0, 1, 0)
+        glScaled(0.5, 0.5, 0.5)
+        glutSolidCube(1.5)
+        glPopMatrix()
+
+        # left wing
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.60, 0.40, 0.12))
+        glTranslatef(1.0, 0.0, 0.0)
+        glRotated(90, 0, 1, 0)
+        glScaled(0.5, 0.5, 0.5)
+        glutSolidCube(1.5)
+        glPopMatrix()
+
+        # beak
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 0.6, 0.0))
+        glTranslatef(0.0, 2.5, 0.8)
+        glRotated(180, 0, 1, 0)
+        glScaled(0.25, 0.5, 0.25)
+        glutSolidCube(1.5)
+        glPopMatrix()
+
+        # crest
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 0.0, 0.0))
+        glTranslatef(0.0, 4.5, 0.0)
+        glRotated(180, 0, 1, 0)
+        glScaled(0.25, 0.5, 0.5)
+        glutSolidCube(1.5)
         glPopMatrix()
 
         glPopMatrix()
