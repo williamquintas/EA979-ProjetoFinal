@@ -938,11 +938,11 @@ class GameMenu:
         self.game = CrossTheStreet()
       
     def startMenu(self):
-        PATH = os.path.join(os.path.dirname(__file__), 'Cross the Street.png')
+        #PATH = os.path.join(os.path.dirname(__file__), 'Cross the Street.png')
         mytheme = pygame_menu.themes.THEME_ORANGE.copy()
-        myimage = pygame_menu.baseimage.BaseImage(image_path=PATH, 
-                                                drawing_mode=pygame_menu.baseimage.IMAGE_MODE_FILL)
-        mytheme.background_color = myimage
+        #myimage = pygame_menu.baseimage.BaseImage(image_path=PATH, 
+                                                #drawing_mode=pygame_menu.baseimage.IMAGE_MODE_FILL)
+        #mytheme.background_color = myimage
 
         mytheme.title_background_color=(0, 0, 0, 0)
         mytheme.widget_font=pygame_menu.font.FONT_8BIT
