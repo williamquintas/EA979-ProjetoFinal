@@ -1,12 +1,13 @@
 import math as mt
 import random as rd
 import sys
+import pygame
+import pygame_menu
 
 import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-
 
 class Field:
     def __init__(self):
@@ -14,7 +15,6 @@ class Field:
         self.isEmpty = None
         self.carPosition = None
         self.treeHeight = None
-
 
 class CrossTheStreet:
     def __init__(self):
@@ -56,13 +56,26 @@ class CrossTheStreet:
 
         self.gameMode = 3 #3 for third person and 1 for first person
 
+        # count steps
+        self.steps = 0
+
+        # Define the character to render
+        self.character = 1
+
+    def selectCharacter(self, player, value):
+        if (player == ('Chicken', 1)):
+            self.character = 1
+        elif (player == ('Bunny', 1)):
+            self.character = 2 
+            
     def run(self):
+
         # initializes GLUT
         glutInit()
         glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
         # creates the window
         glutInitWindowSize(1000, 1000)
-        glutInitWindowPosition(0, 0)
+        glutInitWindowPosition(0,0)
         window = glutCreateWindow("Cross the street")
         # GLUT callback functions
         glutDisplayFunc(self.onDisplay)
@@ -73,7 +86,7 @@ class CrossTheStreet:
         glEnable(GL_DEPTH_TEST)
         # Program infinite loop
         glutMainLoop()
-
+    
     def onDisplay(self):
         # delete previous screen content
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -91,6 +104,10 @@ class CrossTheStreet:
         self.renderTerrain()
         self.renderStreets()
         self.renderPlayer()
+
+        stepsString = "Steps: " + str(self.steps)
+        self.displayText(stepsString, 50, 200, 1, 0, 0)
+
         glutSwapBuffers()
 
     # camera position for each mode
@@ -170,6 +187,7 @@ class CrossTheStreet:
                 self.jump = 'w'
                 self.isRunningTimer2 = True
                 self.zPrevious = self.zCurrent
+                self.steps += 1
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
@@ -186,6 +204,7 @@ class CrossTheStreet:
                 self.jump = 'a'
                 self.isRunningTimer2 = True
                 self.xPrevious = self.xCurrent
+                self.steps += 1
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
@@ -197,6 +216,7 @@ class CrossTheStreet:
                 self.jump = 'd'
                 self.isRunningTimer2 = True
                 self.xPrevious = self.xCurrent
+                self.steps += 1
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
@@ -208,6 +228,7 @@ class CrossTheStreet:
                 self.jump = 's'
                 self.isRunningTimer2 = True
                 self.zPrevious = self.zCurrent
+                self.steps += 1
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
@@ -236,6 +257,7 @@ class CrossTheStreet:
             self.yCurrent = 0.5
             self.zCurrent = 0
             self.zTime = 0
+            self.steps = 0
             glutPostRedisplay()
 
     # the game works like a running machine
@@ -267,7 +289,7 @@ class CrossTheStreet:
                 self.fieldsMatrix[i, 0].carPosition = rd.random() * 8 + 10 * i + 10 * self.time
         # if the player moves backward, all the objects are moved forward in one field
         elif self.jump == 's':
-            for j in range(0, 20):
+            for j in range(1, 20):
                 for i in range(0, 20):
                     self.fieldsMatrix[i, j - 1].isEmpty = self.fieldsMatrix[i, j].isEmpty
                     self.fieldsMatrix[i, j - 1].forestOrStreet = self.fieldsMatrix[i, j].forestOrStreet
@@ -438,15 +460,15 @@ class CrossTheStreet:
             (
                 x >= 0 and
                 x < 20 and
-                self.fieldsMatrix[x, z].forestOrStreet == 'street' and
+                self.fieldsMatrix[x - 1, z].forestOrStreet == 'street' and
                 x % 2 == 1
             ) or (
                 x < 0 and
-                self.fieldsMatrix[x + 15, z].forestOrStreet == 'street' and
+                self.fieldsMatrix[x + 14, z].forestOrStreet == 'street' and
                 np.abs(x) % 2 == 1
             ) or (
                 x >= 20 and
-                self.fieldsMatrix[x - 15, z].forestOrStreet == 'street' and
+                self.fieldsMatrix[x - 14, z].forestOrStreet == 'street' and
                 x % 2 == 1
             )
         ):
@@ -720,6 +742,12 @@ class CrossTheStreet:
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
         glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
         
+        if (self.character == 1):
+            self.renderChicken()
+        elif (self.character == 2):    
+            self.renderBunny()
+
+    def renderChicken(self):
         # body
         glPushMatrix()
         glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.60, 0.40, 0.12))
@@ -775,17 +803,173 @@ class CrossTheStreet:
 
         glPopMatrix()
 
+    def renderBunny(self):
+        # tail
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0, 0.5, -1.5)
+        glRotatef(-20, 1, 0, 0)
+        glutSolidSphere(0.5, 50, 50)
+        glPopMatrix()
+
+        # left ear
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0.35, 1.66, 1)
+        glRotatef(-20, 1, 0, 0)
+        glScalef(0.33, 1, 0.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # right ear
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(-0.35, 1.66, 1)
+        glRotatef(-20, 1, 0, 0)
+        glScalef(0.33, 1, 0.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # head
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0, 0.66, 1.5)
+        glRotatef(15, 1, 0, 0)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # left front leg
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0.5, -0.25, 1)
+        glRotatef(-10, 1, 0, 0)
+        glScalef(0.33, 0.85, 0.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # right front leg
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(-0.5, -0.25, 1)
+        glRotatef(-10, 1, 0, 0)
+        glScalef(0.33, 0.85, 0.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # left back leg
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0.75, 0.2, -0.5)
+        glRotatef(-10, 1, 0, 0)
+        glScalef(0.25, 1, 1)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # right back leg
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(-0.75, 0.2, -0.5)
+        glRotatef(-10, 1, 0, 0)
+        glScalef(0.25, 1, 1)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # body
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0, 0.5, 0)
+        glRotatef(-10, 1, 0, 0)
+        glScalef(1.25, 1, 2.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # left foot
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(0.8, -0.5, -0.25)
+        glRotatef(20, 1, 0, 0)
+        glScalef(0.33, 0.33, 1.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        # right foot
+        glPushMatrix()
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glTranslatef(-0.8, -0.5, -0.25)
+        glRotatef(20, 1, 0, 0)
+        glScalef(0.33, 0.33, 1.33)
+        glutSolidCube(1)
+        glPopMatrix()
+
+        glPopMatrix()
+
     def onReshape(self, width: int, height: int):
         glViewport(0, 0, width, height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(60, float(width/height), 1, 100)
 
+    def displayText(self, text, x, y, red, green, blue):
+        glDisable(GL_TEXTURE_2D)
+        glDisable(GL_LIGHTING)
+        glMatrixMode(GL_PROJECTION)
+        glPushMatrix()
+        glLoadIdentity()
+        gluOrtho2D(0.0, 1000, 0.0, 1000)
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+        glLoadIdentity()
+        glColor3f(red, green, blue)
+        glRasterPos2i(x, y)
+        for ch in text :
+            glutBitmapCharacter( GLUT_BITMAP_TIMES_ROMAN_24 , ctypes.c_int( ord(ch) ) )
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
+        glMatrixMode(GL_MODELVIEW)
+        glPopMatrix()    
+        glEnable(GL_LIGHTING)
+
+class GameMenu:
+    def __init__(self):
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
+        pygame.init()
+        self.gameDisplay = pygame.display.set_mode((800, 800))
+        pygame.display.set_caption('Projeto EA979')
+        self.game = CrossTheStreet()
+      
+    def startMenu(self):
+        PATH = os.path.join(os.path.dirname(__file__), 'Cross the Street.png')
+        mytheme = pygame_menu.themes.THEME_ORANGE.copy()
+        myimage = pygame_menu.baseimage.BaseImage(image_path=PATH, 
+                                                drawing_mode=pygame_menu.baseimage.IMAGE_MODE_FILL)
+        mytheme.background_color = myimage
+
+        mytheme.title_background_color=(0, 0, 0, 0)
+        mytheme.widget_font=pygame_menu.font.FONT_8BIT
+        mytheme.title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_TITLE_ONLY
+        mytheme.title_font=pygame_menu.font.FONT_8BIT
+        mytheme.title_font_color=(37, 207, 240)
+        mytheme.widget_selection_effect=pygame_menu.widgets.LeftArrowSelection(arrow_size=(10, 15), arrow_right_margin=5, arrow_vertical_offset=0, blink_ms=0)
+        mytheme.selection_color=(0, 0, 0)
+        mytheme.widget_font_color=(37, 207, 240)
+        mytheme.widget_font_size=40
+        
+        menu = pygame_menu.Menu(800, 800, 'Cross the Street', theme=mytheme)
+
+        menu.add_button('Play', self.startGame)
+        menu.add_selector('Character :', [('Chicken', 1), ('Bunny', 2)], onchange=self.game.selectCharacter)
+        menu.add_vertical_margin(50)
+        menu.add_button('Quit', pygame_menu.events.EXIT)
+        menu.mainloop(self.gameDisplay) 
+        
+    def startGame(self):
+        pygame.quit()
+        self.game.run()      
 
 def main():
-    game = CrossTheStreet()
-    game.run()
-
+    menu = GameMenu()
+    menu.startMenu()
+    
 
 if __name__ == '__main__':
     main()
