@@ -46,6 +46,16 @@ class CrossTheStreet:
         self.TIMER_2_ID = 0
         self.TIMER_2_INTERVAL = 1
 
+        # camera position
+        self.eyeX = 1
+        self.eyeY = 7 - self.yCurrent
+        self.eyeZ = 3
+        self.centerX = 0
+        self.centerY = 0 - self.yCurrent
+        self.centerZ = 0    
+
+        self.gameMode = 3 #3 for third person and 1 for first person
+
     def run(self):
         # initializes GLUT
         glutInit()
@@ -70,7 +80,7 @@ class CrossTheStreet:
         # configure camera
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        gluLookAt(1, 7 - self.yCurrent, 3, 0, 0 - self.yCurrent, -2, 0, 1, 0)
+        gluLookAt(self.eyeX, self.eyeY,self.eyeZ, self.centerX, self.centerY, self.centerZ, 0, 1, 0)
         if (self.fieldsInitialized == False):
             self.zTrackBegin = -12 - 3
             self.fieldsInitialization()
@@ -83,8 +93,24 @@ class CrossTheStreet:
         self.renderPlayer()
         glutSwapBuffers()
 
-    # timer used to move the cars
+    # camera position for each mode
+    def changeGameMode(self):
+        if self.gameMode == 3:
+            self.eyeX = 1
+            self.eyeY = 7 - self.yCurrent
+            self.eyeZ = 3
+            self.centerX = 0
+            self.centerY = 0 - self.yCurrent
+            self.centerZ = 0 
+        if self.gameMode == 1:
+            self.eyeX = 0
+            self.eyeY = 1
+            self.eyeZ = 0
+            self.centerX = 0
+            self.centerY = 1
+            self.centerZ = -7
 
+    # timer used to move the cars
     def onTimer1(self, value: int):
         if value != 0:
             return
@@ -94,7 +120,6 @@ class CrossTheStreet:
             glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
     # player jump timer
-
     def onTimer2(self, value: int):
         if value != 0:
             return
@@ -187,6 +212,14 @@ class CrossTheStreet:
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
+
+        elif key == '1': # first person mode
+            self.gameMode = 1
+            self.changeGameMode()
+
+        elif key == '3': # third person mode
+            self.gameMode = 3
+            self.changeGameMode()
 
         elif key == 'r':  # reinitialize variables
             self.alpha = 0
