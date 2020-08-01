@@ -46,6 +46,9 @@ class CrossTheStreet:
         self.TIMER_2_ID = 0
         self.TIMER_2_INTERVAL = 1
 
+        # variável que guarda a direção da frente do personagem
+        self.currentFront = 'w'
+
         # camera position
         self.eyeX = 1
         self.eyeY = 7 - self.yCurrent
@@ -103,12 +106,93 @@ class CrossTheStreet:
             self.centerY = 0 - self.yCurrent
             self.centerZ = 0 
         if self.gameMode == 1:
-            self.eyeX = 0
+            self.eyeX = 0.5
             self.eyeY = 1
-            self.eyeZ = 0
+            self.eyeZ = 0.5
+            # A direção em que a câmera aponta dependerá da frente do personagem
+            self.changeCameraDirection()
+
+            
+    def changeFrontAnticlockwise(self):
+        # Muda câmera no sentido anti-horário
+        if self.currentFront == 'w':
+            self.currentFront = 'a'
+        elif self.currentFront == 'a' :
+            self.currentFront = 's'
+        elif self.currentFront == 's':
+            self.currentFront = 'd'
+        elif self.currentFront == 'd':
+            self.currentFront = 'w' 
+
+    def changeFrontClockwise(self):            
+        # Muda câmera no sentido horário
+        if self.currentFront == 'w':
+            self.currentFront = 'd'
+        elif self.currentFront == 'd':
+            self.currentFront = 's'
+        elif self.currentFront == 's':
+            self.currentFront = 'a'
+        elif self.currentFront == 'a':
+            self.currentFront = 'w'
+
+    def changeFrontThirdPerson(self):
+        if (self.jump == 'w'):
+            self.currentFront = 'w'
+        if (self.jump == 'a'):
+            self.currentFront = 'a'
+        if (self.jump == 's'):
+            self.currentFront = 's'
+        if (self.jump == 'd'):
+            self.currentFront = 'd'
+            
+    def changeCameraDirection(self):
+        # Agora que a direção (frente) atual já está settada, mudamos
+        # a câmera para essa direção
+        self.centerY = 1
+        if self.currentFront == 'w':
             self.centerX = 0
-            self.centerY = 1
             self.centerZ = -7
+        elif self.currentFront == 's':
+            self.centerX = 0
+            self.centerZ = 7
+        elif self.currentFront == 'd':
+            self.centerX = 7
+            self.centerZ = 0
+        elif self.currentFront == 'a':
+            self.centerX = -7
+            self.centerZ = 0              
+
+    def translateDirection(self, key: str):
+        #if when front is 'w', direction is already correct
+        if (self.currentFront == 'a'):
+            if (key == 'w'):
+                key = 'a'
+            elif (key == 'a'):
+                key = 's'
+            elif (key == 's'):
+                key = 'd'
+            elif (key == 'd'):
+                key = 'w'
+        elif (self.currentFront == 's'):
+            if (key == 'w'):
+                key = 's'
+            elif (key == 'a'):
+                key = 'd'
+            elif (key == 's'):
+                key = 'w'
+            elif (key == 'd'):
+                key = 'a'
+        elif (self.currentFront == 'd'):
+            if (key == 'w'):
+                key = 'd'
+            elif (key == 'a'):
+                key = 'w'
+            elif (key == 's'):
+                key = 'a'
+            elif (key == 'd'):
+                key = 's'
+
+        return key
 
     # timer used to move the cars
     def onTimer1(self, value: int):
@@ -162,8 +246,18 @@ class CrossTheStreet:
         self.previousJump = self.jump
         keycode = ord(key)
         key = key.decode('utf-8')
+
+        # Primeira pessoa: as teclas mudam de direção dependendo de
+        # onde é a frente do personagem
+        if(self.gameMode == 1):
+            key = self.translateDirection(key)
+        # Terceira pessoa: a frente sempre será a tecla que foi pressionada
+        elif(self.gameMode == 3):
+            self.changeFrontThirdPerson()
+
         if keycode == 27:
             sys.exit()
+
         elif key == 'w':  # moves forward
             if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
@@ -180,7 +274,7 @@ class CrossTheStreet:
                 self.beginAnimation = False
                 glutPostRedisplay()
 
-        elif key == 'a':  # moves to left
+        elif key == 'a':  # moves to left           
             if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
                 self.jump = 'a'
@@ -191,7 +285,7 @@ class CrossTheStreet:
                     self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
 
-        elif key == 'd':  # moves to right    
+        elif key == 'd':  # moves to right                
             if self.fieldsMatrix[int(self.xCurrent + 11), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
                 self.jump = 'd'
@@ -216,10 +310,18 @@ class CrossTheStreet:
         elif key == '1': # first person mode
             self.gameMode = 1
             self.changeGameMode()
-
         elif key == '3': # third person mode
             self.gameMode = 3
             self.changeGameMode()
+
+        elif key == 'o': # muda camera no sentido anti-horário
+            if self.gameMode == 1:
+                self.changeFrontAnticlockwise()
+                self.changeCameraDirection()
+        elif key == 'p': # muda camera no sentido horário
+            if self.gameMode == 1:
+                self.changeFrontClockwise()
+                self.changeCameraDirection()
 
         elif key == 'r':  # reinitialize variables
             self.alpha = 0
