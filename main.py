@@ -63,7 +63,7 @@ class CrossTheStreet:
         self.character = 1
 
     def selectCharacter(self, player, value):
-        if (player == ('Chicken', 1)):
+        if (player == ('Chicken', 0)):
             self.character = 1
         elif (player == ('Bunny', 1)):
             self.character = 2 
