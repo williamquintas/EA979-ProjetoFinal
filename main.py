@@ -113,7 +113,7 @@ class CrossTheStreet:
         self.renderPlayer()
 
         stepsString = "Steps: " + str(self.steps)
-        self.displayText(stepsString, 50, 200, 1, 0, 0)
+        self.renderText(stepsString, 50, 200, 1, 0, 0)
 
         glutSwapBuffers()
 
@@ -780,6 +780,7 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
+            self.renderText("Game Over. Press R to restart!", 200, 500, 1, 0, 0)
 
             if (self.previousJump == 'a'):
                 glRotatef(70, 0, 1, 0)
@@ -792,7 +793,8 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, 0)
             glScalef(1, 0.2, 1)
-
+            self.renderText("Game Over. Press R to restart!", 200, 500, 1, 0, 0)
+            
         if (self.jump == 'a' and self.previousJump == 'a'):
             glRotatef(-90, 0, 1, 0)
 
