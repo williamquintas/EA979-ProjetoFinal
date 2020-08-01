@@ -9,6 +9,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
+
 class Field:
     def __init__(self):
         self.forestOrStreet = None
@@ -61,7 +62,7 @@ class CrossTheStreet:
 
         # Define the character to render
         self.character = 1
-
+        
     def selectCharacter(self, player, value):
         if (player == ('Chicken', 0)):
             self.character = 1
@@ -69,7 +70,7 @@ class CrossTheStreet:
             self.character = 2 
             
     def run(self):
-
+        
         # initializes GLUT
         glutInit()
         glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
@@ -81,6 +82,7 @@ class CrossTheStreet:
         glutDisplayFunc(self.onDisplay)
         glutKeyboardFunc(self.onKeyboard)
         glutReshapeFunc(self.onReshape)
+        
         # Initializes OpenGL
         glClearColor(1, 1, 1, 0)
         glEnable(GL_DEPTH_TEST)
@@ -910,24 +912,36 @@ class CrossTheStreet:
         gluPerspective(60, float(width/height), 1, 100)
 
     def displayText(self, text, x, y, red, green, blue):
+        
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_LIGHTING)
+        glDisable(GL_DEPTH_TEST)
         glMatrixMode(GL_PROJECTION)
+        
         glPushMatrix()
         glLoadIdentity()
         gluOrtho2D(0.0, 1000, 0.0, 1000)
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
         glLoadIdentity()
+        
+        glPushMatrix()
         glColor3f(red, green, blue)
-        glRasterPos2i(x, y)
-        for ch in text :
-            glutBitmapCharacter( GLUT_BITMAP_TIMES_ROMAN_24 , ctypes.c_int( ord(ch) ) )
+        glTranslatef(x, y, 0.0)
+        glScalef(0.2, 0.5, 0.5)
+        
+        for ch in text:
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, ord(ch))
+            glTranslatef(20, 0.0, 0.0)
+        glPopMatrix()
+        
         glMatrixMode(GL_PROJECTION)
         glPopMatrix()
         glMatrixMode(GL_MODELVIEW)
         glPopMatrix()    
+        
         glEnable(GL_LIGHTING)
+        glEnable(GL_DEPTH_TEST)
 
 class GameMenu:
     def __init__(self):
