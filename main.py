@@ -569,15 +569,15 @@ class CrossTheStreet:
             (
                 x >= 0 and
                 x < 20 and
-                self.fieldsMatrix[x - 1, z].forestOrStreet == 'street' and
+                self.fieldsMatrix[x - 1, z + 1].forestOrStreet == 'street' and
                 x % 2 == 1
             ) or (
                 x < 0 and
-                self.fieldsMatrix[x + 14, z].forestOrStreet == 'street' and
+                self.fieldsMatrix[x + 14, z + 1].forestOrStreet == 'street' and
                 np.abs(x) % 2 == 1
             ) or (
                 x >= 20 and
-                self.fieldsMatrix[x - 14, z].forestOrStreet == 'street' and
+                self.fieldsMatrix[x - 14, z + 1].forestOrStreet == 'street' and
                 x % 2 == 1
             )
         ):
