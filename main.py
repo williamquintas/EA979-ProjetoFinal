@@ -61,8 +61,15 @@ class CrossTheStreet:
         self.centerY = 0 - self.yCurrent
         self.centerZ = 0          
 
-        # Numero de passos do jogador
+        # Numero de passos totais do jogador
         self.steps = 0
+
+        # Numero de passos para frente do jogador
+        self.stepsZ = 0
+
+        # Indica para mudar de fase
+        self.level = 0
+        self.nextLevel = False
 
         # define qual personagem renderizar
         self.character = 1
@@ -104,7 +111,7 @@ class CrossTheStreet:
         gluLookAt(self.eyeX, self.eyeY,self.eyeZ, self.centerX, self.centerY, self.centerZ, 0, 1, 0)
         if (self.fieldsInitialized == False):
             self.zTrackBegin = -12 - 3
-            self.fieldsInitialization()
+            self.fieldsInitialization(self.level)
             self.fieldsInitialized = True
             self.fieldsMatrix[10, -self.zTrackBegin].isEmpty = True
         self.configureIllumination()
@@ -265,6 +272,13 @@ class CrossTheStreet:
 
         self.isRunningTimer2 = False
 
+    def verifyStepsZ(self):    
+        # atingiu total de passos para atravessar todas as ruas, inicializa novo field para nova fase
+        if(self.stepsZ == 15):
+            self.nextLevel = True
+            self.beginAnimation = False
+            glutPostRedisplay()
+
     def onKeyboard(self, key: str, x: int, y: int):
         self.previousJump = self.jump
         keycode = ord(key)
@@ -288,6 +302,7 @@ class CrossTheStreet:
                 self.isRunningTimer2 = True
                 self.zPrevious = self.zCurrent
                 self.steps += 1
+                self.stepsZ += 1
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
@@ -297,6 +312,8 @@ class CrossTheStreet:
                 self.crashedInSomething = True
                 self.beginAnimation = False
                 glutPostRedisplay()
+
+            self.verifyStepsZ()    
 
         elif key == 'a':  # para esquerda           
             if self.fieldsMatrix[int(self.xCurrent + 9), -self.zTrackBegin].isEmpty == True and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
@@ -329,6 +346,7 @@ class CrossTheStreet:
                 self.isRunningTimer2 = True
                 self.zPrevious = self.zCurrent
                 self.steps += 1
+                self.stepsZ -= 1
                 glutTimerFunc(self.TIMER_2_INTERVAL, self.onTimer2, self.TIMER_2_ID)
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
@@ -367,7 +385,32 @@ class CrossTheStreet:
             self.zCurrent = 0
             self.zTime = 0
             self.steps = 0
+            self.stepsZ = 0
+            self.level = 0 # comeca da primeira fase
+            self.nextLevel = False
             glutPostRedisplay()
+        # para comecar a proxima fase    
+        elif key == 'n':
+            self.alpha = 0
+            self.beginAnimation = True
+            self.carHitPlayer = False
+            self.crashedInSomething = False
+            self.fieldsInitialized = False
+            self.jump = 'w'
+            self.previousJump = 'w'
+            self.isRunningTimer1 = False
+            self.isRunningTimer2 = False
+            self.time = 0
+            self.xCurrent = 0
+            self.yCurrent = 0.5
+            self.zCurrent = 0
+            self.zTime = 0
+            self.steps = 0
+            self.stepsZ = 0
+            self.level += 1 # proxima fase
+            self.nextLevel = False
+            glutPostRedisplay()
+    
 
     # o jogo funciona como uma esteira: as coordenadas do jogador e da câmera permanecem estáticas
     # enquanto o campo e os objetos presentes nele se mexem em relação ao jogador
@@ -407,24 +450,55 @@ class CrossTheStreet:
                     self.fieldsMatrix[i, j - 1].treeHeight = self.fieldsMatrix[i, j].treeHeight
 
     # posição das árvores aleatóras e posição dos carros
-    def fieldsInitialization(self):
+    def fieldsInitialization(self, fase):
         rd.seed()
         for i in range(0, 20):
             for j in range(0, 25):
-                if (j > 9):
-                    self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                elif (j % 3 == 0):
-                    self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                else:
-                    self.fieldsMatrix[i, j].forestOrStreet = 'street'
+                if (fase == 0):
+                    if (j > 9):
+                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+                    elif (j % 3 == 0):
+                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+                    else:
+                        self.fieldsMatrix[i, j].forestOrStreet = 'street'
 
-                if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
-                    self.fieldsMatrix[i, j].isEmpty = False
-                    self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
-                else:
-                    self.fieldsMatrix[i, j].isEmpty = True
+                    if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
+                        self.fieldsMatrix[i, j].isEmpty = False
+                        self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
+                    else:
+                        self.fieldsMatrix[i, j].isEmpty = True
 
-                self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
+                    self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
+                elif (fase == 1):
+                    if (j > 8):
+                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+                    elif (j % 4 == 0):
+                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+                    else:
+                        self.fieldsMatrix[i, j].forestOrStreet = 'street'
+
+                    if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
+                        self.fieldsMatrix[i, j].isEmpty = False
+                        self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
+                    else:
+                        self.fieldsMatrix[i, j].isEmpty = True
+
+                    self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
+                elif (fase == 2):
+                    if (j > 9):
+                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+                    elif (j % 6 == 0):
+                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+                    else:
+                        self.fieldsMatrix[i, j].forestOrStreet = 'street'
+
+                    if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
+                        self.fieldsMatrix[i, j].isEmpty = False
+                        self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
+                    else:
+                        self.fieldsMatrix[i, j].isEmpty = True
+
+                    self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i    
 
     def configureIllumination(self):
         glEnable(GL_LIGHTING)
@@ -781,20 +855,25 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
-            self.renderText("Game Over. Press R to restart!", 200, 400, 1, 0, 0)
+            self.renderText("Game Over! Press R to restart.", 200, 400, 1, 0, 0)
 
             if (self.previousJump == 'a'):
                 glRotatef(70, 0, 1, 0)
 
             if (self.previousJump == 'd'):
                 glRotatef(-70, 0, 1, 0)
+         
+        if (self.nextLevel == True):
+            self.isRunningTimer1 = False
+            self.renderText("You pass! Press N to start next level.", 200, 400, 1, 0, 0)
+    
 
         if (self.carHitPlayer == True):
             self.beginAnimation = False
             self.isRunningTimer1 = False
             glTranslatef(0, 0, 0)
             glScalef(1, 0.2, 1)
-            self.renderText("Game Over. Press R to restart!", 200, 400, 1, 0, 0)
+            self.renderText("Game Over! Press R to restart.", 200, 400, 1, 0, 0)
             
         if (self.jump == 'a' and self.previousJump == 'a'):
             glRotatef(-90, 0, 1, 0)
