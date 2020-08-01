@@ -399,8 +399,8 @@ class CrossTheStreet:
         # quando o jogador anda para trás (eixo z positivo), todos os objetos são movidos um 
         # campo para frente
         elif self.jump == 's':
-            for j in range(1, 20):
-                for i in range(0, 25):
+            for j in range(1, 25):
+                for i in range(0, 20):
                     self.fieldsMatrix[i, j - 1].isEmpty = self.fieldsMatrix[i, j].isEmpty
                     self.fieldsMatrix[i, j - 1].forestOrStreet = self.fieldsMatrix[i, j].forestOrStreet
                     self.fieldsMatrix[i, j - 1].carPosition = self.fieldsMatrix[i, j].carPosition
@@ -411,7 +411,7 @@ class CrossTheStreet:
         rd.seed()
         for i in range(0, 20):
             for j in range(0, 25):
-                if (j > 5):
+                if (j > 9):
                     self.fieldsMatrix[i, j].forestOrStreet = 'forest'
                 elif (j % 3 == 0):
                     self.fieldsMatrix[i, j].forestOrStreet = 'forest'
@@ -781,7 +781,7 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
-            self.renderText("Game Over. Press R to restart!", 200, 500, 1, 0, 0)
+            self.renderText("Game Over. Press R to restart!", 200, 400, 1, 0, 0)
 
             if (self.previousJump == 'a'):
                 glRotatef(70, 0, 1, 0)
@@ -794,7 +794,7 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, 0)
             glScalef(1, 0.2, 1)
-            self.renderText("Game Over. Press R to restart!", 200, 500, 1, 0, 0)
+            self.renderText("Game Over. Press R to restart!", 200, 400, 1, 0, 0)
             
         if (self.jump == 'a' and self.previousJump == 'a'):
             glRotatef(-90, 0, 1, 0)
