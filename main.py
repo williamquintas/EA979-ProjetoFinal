@@ -20,10 +20,11 @@ class Field:
 class CrossTheStreet:
     def __init__(self):
         # inicializa a matriz do campo
-        fieldsSize = 20
-        self.fieldsMatrix = np.empty((fieldsSize, fieldsSize), dtype=Field)
-        for i in range(fieldsSize):
-            for j in range(fieldsSize):
+        fieldsSizeX = 20
+        fieldsSizeY = 25
+        self.fieldsMatrix = np.empty((fieldsSizeX, fieldsSizeY), dtype=Field)
+        for i in range(fieldsSizeX):
+            for j in range(fieldsSizeY):
                 self.fieldsMatrix[i, j] = Field()
 
         # declaração e inicialização de variáveis
@@ -291,7 +292,7 @@ class CrossTheStreet:
                 if self.isRunningTimer1 == False:
                     self.isRunningTimer1 = True
                     glutTimerFunc(self.TIMER_1_INTERVAL, self.onTimer1, self.TIMER_1_ID)
-
+                
             elif (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == False and self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].forestOrStreet != 'forest') and self.beginAnimation == True and self.isRunningTimer2 == False:
                 self.crashedInSomething = True
                 self.beginAnimation = False
@@ -376,7 +377,7 @@ class CrossTheStreet:
         # quando o jogador anda para frente (eixo z negativo), todos os objetos são movidos um 
         # campo para trás e um novo campo é criado após a última linha
         if self.jump == 'w':
-            for j in range(18, -1, -1):
+            for j in range(23, -1, -1):
                 for i in range(0, 20):
                     self.fieldsMatrix[i, j + 1].isEmpty = self.fieldsMatrix[i, j].isEmpty
                     self.fieldsMatrix[i, j + 1].forestOrStreet = self.fieldsMatrix[i, j].forestOrStreet
@@ -399,7 +400,7 @@ class CrossTheStreet:
         # campo para frente
         elif self.jump == 's':
             for j in range(1, 20):
-                for i in range(0, 20):
+                for i in range(0, 25):
                     self.fieldsMatrix[i, j - 1].isEmpty = self.fieldsMatrix[i, j].isEmpty
                     self.fieldsMatrix[i, j - 1].forestOrStreet = self.fieldsMatrix[i, j].forestOrStreet
                     self.fieldsMatrix[i, j - 1].carPosition = self.fieldsMatrix[i, j].carPosition
@@ -409,7 +410,7 @@ class CrossTheStreet:
     def fieldsInitialization(self):
         rd.seed()
         for i in range(0, 20):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if (j > 5):
                     self.fieldsMatrix[i, j].forestOrStreet = 'forest'
                 elif (j % 3 == 0):
@@ -441,13 +442,13 @@ class CrossTheStreet:
         glPushMatrix()
         glTranslatef(-self.xCurrent, -self.yCurrent, -self.zCurrent)
         for i in range(0, 20):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if self.fieldsMatrix[i, j].isEmpty == False and self.fieldsMatrix[i, j].forestOrStreet == 'forest':
                     self.renderTree(i - 10, self.zTrackBegin + j)
-        for j in range(0, 20):
+        for j in range(0, 25):
             if self.fieldsMatrix[1, j].forestOrStreet == 'forest':
                 self.renderTree(-11, self.zTrackBegin + j)
-        for j in range(0, 20):
+        for j in range(0, 25):
             if self.fieldsMatrix[19, j].forestOrStreet == 'forest':
                 self.renderTree(10, self.zTrackBegin + j)
         glPopMatrix()
@@ -507,7 +508,7 @@ class CrossTheStreet:
         glPushMatrix()
         glTranslatef(-self.xCurrent, -self.yCurrent, -self.zCurrent)
         for i in range(0, 20):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if self.fieldsMatrix[i, j].forestOrStreet != 'street':
                     self.renderGrass(i, j)
 
@@ -543,19 +544,19 @@ class CrossTheStreet:
         glPushMatrix()
         glTranslatef(-self.xCurrent, -self.yCurrent, -self.zCurrent)
         for i in range(0, 20):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if self.fieldsMatrix[i, j].forestOrStreet == 'street':
                     self.renderAsphalt(i, j)
         for i in range(-10, 0):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if self.fieldsMatrix[i+15, j].forestOrStreet == 'street':
                     self.renderAsphalt(i, j)
         for i in range(20, 30):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if self.fieldsMatrix[i-15, j].forestOrStreet == 'street':
                     self.renderAsphalt(i, j)
         for i in range(0, 20):
-            for j in range(0, 20):
+            for j in range(0, 25):
                 if self.fieldsMatrix[i, j].forestOrStreet == 'street':
                     self.renderCar(self.fieldsMatrix[i, j].carPosition, j)
         glPopMatrix()
