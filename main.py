@@ -113,12 +113,13 @@ class CrossTheStreet:
         glEnable(GL_DEPTH_TEST)
         # Inicializa as texturas da skybox
         glEnable(GL_TEXTURE_2D)
-        self.SKYFRONT = loadTexture('./data/texture/testee.png')
-        self.SKYBACK = loadTexture('./data/texture/testee.png')
-        self.SKYLEFT = loadTexture('./data/texture/testee.png')
-        self.SKYRIGHT = loadTexture('./data/texture/testee.png')
-        self.SKYUP = loadTexture('./data/texture/testee.png')
-        self.SKYDOWN = loadTexture('./data/texture/down.jpg')
+        self.SKYFRONT = loadTexture('./data/texture/sky2.png')
+        self.SKYBACK = self.SKYFRONT
+        self.SKYLEFT = self.SKYFRONT
+        self.SKYRIGHT = self.SKYFRONT
+        self.SKYUP = self.SKYFRONT
+        self.SKYDOWN = self.SKYFRONT
+        
         # Setta o loop do programa
         glutMainLoop()
     
@@ -517,7 +518,6 @@ class CrossTheStreet:
     def configureIllumination(self):
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
-        glEnable(GL_LIGHT1)
         position = (GLfloat * 4)(0, self.lightPosY, self.lightPosZ, self.lightPosJoker)
         ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
         diffuse = (GLfloat * 4)(0.7, 0.7, 0.7, 1)
@@ -526,12 +526,6 @@ class CrossTheStreet:
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambient)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse)
         glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
-
-        position = (GLfloat * 4)(0, 4.5,-63, 1)
-        glLightfv(GL_LIGHT1, GL_POSITION, position)
-        glLightfv(GL_LIGHT1, GL_AMBIENT, ambient)
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse)
-        glLightfv(GL_LIGHT1, GL_SPECULAR, specular)
 
     def renderForest(self):
         glPushMatrix()
@@ -710,6 +704,7 @@ class CrossTheStreet:
         glEnable(GL_LIGHTING)
 
     def renderSkybox (self, x, y, z, width, height, length):
+        glDisable(GL_LIGHTING)
         # desenha 6 quadrados, adiciona textura a eles e os posiciona ao redor da
 
         # Centraliza Skybox em torno das posicoes dadas x,y e z 
@@ -718,9 +713,12 @@ class CrossTheStreet:
         z = z - length / 2
 
         #Coloração branca para os quadrados
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
+        glColor3f(1, 1, 1)
+
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
 
         # Desenha parte da frente
+        glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYFRONT)
         glBegin(GL_QUADS)		
         glTexCoord2f(1.0, 0.0)
@@ -738,7 +736,6 @@ class CrossTheStreet:
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYBACK)
         glBegin(GL_QUADS)
-        glColor3f(0.0, 0.0, 0.0)
         glTexCoord2f(1.0, 0.0)
         glVertex3f(x+width, y,z)
         glTexCoord2f(1.0, 1.0)
