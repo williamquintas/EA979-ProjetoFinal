@@ -146,7 +146,7 @@ class CrossTheStreet:
         self.renderPlayer()
 
         stepsString = "Steps: " + str(self.steps)
-        self.renderText(stepsString, 50, 200, 1, 0, 0)
+        self.renderText(stepsString, 50, 200, 1, 0, 0, 0)
 
         glutSwapBuffers()
 
@@ -979,7 +979,7 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, -0.5)
             glScalef(1, 1, 0.2)
-            self.renderText("Game Over! Press R to restart.", 200, 400, 1, 0, 0)
+            self.renderText("Game Over! Press R to restart.", 200, 400, 1, 0, 0, 1)
 
             if (self.previousJump == 'a'):
                 glRotatef(70, 0, 1, 0)
@@ -989,7 +989,7 @@ class CrossTheStreet:
          
         if (self.nextLevel == True):
             self.isRunningTimer1 = False
-            self.renderText("You pass! Press N to start next level.", 200, 400, 1, 0, 0)
+            self.renderText("You pass! Press N to start next level.", 200, 400, 1, 0, 0, 2)
     
 
         if (self.carHitPlayer == True):
@@ -997,7 +997,7 @@ class CrossTheStreet:
             self.isRunningTimer1 = False
             glTranslatef(0, 0, 0)
             glScalef(1, 0.2, 1)
-            self.renderText("Game Over! Press R to restart.", 200, 400, 1, 0, 0)
+            self.renderText("Game Over! Press R to restart.", 200, 400, 1, 0, 0, 1)
             
         if (self.jump == 'a' and self.previousJump == 'a'):
             glRotatef(-90, 0, 1, 0)
@@ -1225,7 +1225,7 @@ class CrossTheStreet:
         gluPerspective(60, float(width/height), 1, 100)
 
     # funcao para renderizar texto
-    def renderText(self, text, x, y, red, green, blue):
+    def renderText(self, text, x, y, red, green, blue, messageType):
 
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)
@@ -1238,6 +1238,25 @@ class CrossTheStreet:
         glPushMatrix()
         glLoadIdentity()
         
+        # Renderiza um retangulo atras do texto para visualizar melhor
+        glPushMatrix()
+        glColor3f(1, 1, 1)
+        glBegin(GL_QUADS)
+        glVertex2f(x, y + 50)
+        glVertex2f(x, y - 10)
+        if (messageType == 0):  
+            glVertex2f(y, y - 10)
+            glVertex2f(y, y + 50)
+        elif (messageType == 1):
+            glVertex2f(y + 350, y - 10)
+            glVertex2f(y + 350, y + 50)
+        elif (messageType == 2):
+            glVertex2f(y + 450, y - 10)
+            glVertex2f(y + 450, y + 50)
+        glEnd()
+        glPopMatrix()
+        
+        # Renderiza os caracteres do texto
         glPushMatrix()
         glColor3f(red, green, blue)
         glTranslatef(x, y, 0.0)
