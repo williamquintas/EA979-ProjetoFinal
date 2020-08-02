@@ -1,11 +1,25 @@
+import glm
 import math as mt
 import random as rd
 import sys
+import pygame
 
 import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+
+def loadTexture(texture_url):
+    tex_id = glGenTextures(1)
+    tex = pygame.image.load(texture_url)
+    tex_surface = pygame.image.tostring(tex, 'RGBA', 1)
+    tex_width, tex_height = tex.get_size()
+    glBindTexture(GL_TEXTURE_2D, tex_id)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_surface)
+    glBindTexture(GL_TEXTURE_2D, 0)
+    return tex_id   
 
 
 class Field:
@@ -57,7 +71,13 @@ class CrossTheStreet:
         self.eyeZ = 3
         self.centerX = 0
         self.centerY = 0 - self.yCurrent
-        self.centerZ = 0          
+        self.centerZ = 0              
+
+        #posição da luz
+        self.lightPosX = 8
+        self.lightPosY = 9
+        self.lightPosZ = -63
+        self.lightPosJoker = 1
 
     def run(self):
         # inicializa o GLUT
@@ -74,6 +94,14 @@ class CrossTheStreet:
         # Inicia OpenGL
         glClearColor(1, 1, 1, 0)
         glEnable(GL_DEPTH_TEST)
+        # Inicializa as texturas da skybox
+        glEnable(GL_TEXTURE_2D)
+        self.SKYFRONT = loadTexture('./data/texture/testee.png')
+        self.SKYBACK = loadTexture('./data/texture/testee.png')
+        self.SKYLEFT = loadTexture('./data/texture/testee.png')
+        self.SKYRIGHT = loadTexture('./data/texture/testee.png')
+        self.SKYUP = loadTexture('./data/texture/testee.png')
+        self.SKYDOWN = loadTexture('./data/texture/down.jpg')
         # Setta o loop do programa
         glutMainLoop()
 
@@ -94,6 +122,7 @@ class CrossTheStreet:
             self.fieldsInitialized = True
             self.fieldsMatrix[10, -self.zTrackBegin].isEmpty = True
         self.configureIllumination()
+        self.renderSkybox(0, 0, 0, 50, 50, 50)
         self.renderForest()
         self.renderTerrain()
         self.renderStreets()
@@ -252,6 +281,12 @@ class CrossTheStreet:
         keycode = ord(key)
         key = key.decode('utf-8')
 
+        print("light:")
+        print(self.lightPosX)
+        print(self.lightPosY)
+        print(self.lightPosZ)
+        print(self.lightPosJoker)
+
         # Primeira pessoa: as teclas mudam de direção dependendo de
         # onde é a frente do personagem
         if(self.gameMode == 1):
@@ -262,6 +297,56 @@ class CrossTheStreet:
 
         if keycode == 27:
             sys.exit()
+
+
+
+        elif key == '7':
+            self.eyeX = self.eyeX + 1
+        elif key == '4':
+            self.eyeX = self.eyeX - 1
+        elif key == '8':
+            self.eyeY = self.eyeY + 1
+        elif key == '5':
+            self.eyeY = self.eyeY - 1 
+        elif key == '9':
+            self.eyeZ = self.eyeZ + 1
+        elif key == '6':
+            self.eyeZ = self.eyeZ - 1
+
+
+        elif key == 'f':
+            self.centerX = self.centerX + 1
+        elif key == 'v':
+            self.centerX = self.centerX - 1
+        elif key == 'g':
+            self.centerY = self.centerY + 1
+        elif key == 'b':
+            self.centerY = self.centerY - 1 
+        elif key == 'h':
+            self.centerZ = self.centerZ + 1
+        elif key == 'n':
+            self.centerZ = self.centerZ - 1
+
+            
+
+        elif key == 'F':
+            self.lightPosX = self.lightPosX + 1
+        elif key == 'V':
+            self.lightPosX = self.lightPosX - 1
+        elif key == 'G':
+            self.lightPosY = self.lightPosY + 1
+        elif key == 'B':
+            self.lightPosY = self.lightPosY - 1 
+        elif key == 'H':
+            self.lightPosZ = self.lightPosZ + 1
+        elif key == 'N':
+            self.lightPosZ = self.lightPosZ - 1            
+        elif key == 'J':
+            self.lightPosJoker = self.lightPosJoker + 1
+        elif key == 'M':
+            self.lightPosJoke = self.lightPosJoker - 1  
+
+            
 
         elif key == 'w':  # para frente
             if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
@@ -406,14 +491,14 @@ class CrossTheStreet:
     def configureIllumination(self):
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
-        position = (GLfloat * 4)(7, 7, 7, 0)
+        position = (GLfloat * 4)(self.lightPosX, self.lightPosY, self.lightPosZ, self.lightPosJoker)
         ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
         diffuse = (GLfloat * 4)(0.7, 0.7, 0.7, 1)
         specular = (GLfloat * 4)(0.9, 0.9, 0.9, 1)
         glLightfv(GL_LIGHT0, GL_POSITION, position)
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambient)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse)
-        glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specular)    
 
     def renderForest(self):
         glPushMatrix()
@@ -591,8 +676,118 @@ class CrossTheStreet:
 
         glEnable(GL_LIGHTING)
 
+    def renderSkybox (self, x, y, z, width, height, length):
+        # desenha 6 quadrados, adiciona textura a eles e os posiciona ao redor da
+
+        #Center the Skybox around the given x,y,z position
+        x = x - width  / 2
+        y = y - height / 2
+        z = z - length / 2
+
+        #glDisable(GL_LIGHTING)
+        #glColor3f(1, 1, 1)
+        ambient = (GLfloat * 4)(1, 1, 1, 1)
+        specular = (GLfloat * 4)(1, 1, 1, 1)
+        brightness = (GLfloat * 1)(0)
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
+        glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
+
+        #Draw Front side
+        glBindTexture(GL_TEXTURE_2D, self.SKYFRONT)
+        glBegin(GL_QUADS);		
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y, z + length)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x, y + height, z+length)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x+width, y+height, z+length)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x+width, y,z+length)
+        glEnd()    
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        #Draw Back side
+        glColor3f(1, 1, 1)
+        glBindTexture(GL_TEXTURE_2D, self.SKYBACK)
+        glBegin(GL_QUADS)
+        glColor3f(0.0, 0.0, 0.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x+width, y,z)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x+width, y+height, z); 
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x,y+height,z)
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x,y,z)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        #Draw Left side
+        glColor3f(1, 1, 1)
+        glBindTexture(GL_TEXTURE_2D, self.SKYLEFT)
+        glBegin(GL_QUADS);		
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x, y+height,z)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y+height, z+length) 
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y, z+length)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y, z)		
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        #Draw Right side
+        glColor3f(1, 1, 1)
+        glBindTexture(GL_TEXTURE_2D, self.SKYRIGHT)
+        glBegin(GL_QUADS);		
+        glTexCoord2f(0.0, 0.0) 
+        glVertex3f(x+width, y, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x+width, y, z+length)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x+width, y+height,	z+length)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x+width, y+height,	z)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        #Draw Up side
+        glColor3f(1, 1, 1)
+        glBindTexture(GL_TEXTURE_2D, self.SKYUP)
+        glBegin(GL_QUADS)	
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x+width, y+height, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x+width, y+height, z+length)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x,		  y+height,	z+length)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x,y+height,	z)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        #Draw Down side
+        glColor3f(1, 1, 1)
+        glBindTexture(GL_TEXTURE_2D, self.SKYDOWN)
+        glBegin(GL_QUADS);		
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y, z+length)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x+width, y,	z+length)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x+width, y,	z)
+        glEnd()    
+        glBindTexture(GL_TEXTURE_2D, 0)
+
     def renderCar(self, x, z):
 
+        #Aqui há a montagem e a desmontagem dos modelos
+        # TSR, só que ao invés de colocar as matriz todas juntas, elas são aplicadas uma por vez.
         glPushMatrix()
         glColor3f(1, 1, 0)
         glTranslatef(-10 + self.time * 10 - x, 0.3, z + self.zTrackBegin)
@@ -821,10 +1016,10 @@ class CrossTheStreet:
 
         glScalef(0.25, 0.25, 0.25)
 
-        ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
+        #ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
         specular = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
         brightness = (GLfloat * 1)(0.0)
-        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
+        #glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
         glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
         
