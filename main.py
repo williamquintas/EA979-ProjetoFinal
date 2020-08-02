@@ -2,10 +2,7 @@ import math as mt
 import random as rd
 import sys
 import pygame
-<<<<<<< HEAD
 import pygame_menu
-=======
->>>>>>> 7dcab39c548b061da637fa316a64e3d6f937ff1d
 
 import numpy as np
 from OpenGL.GL import *
