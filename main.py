@@ -55,7 +55,6 @@ class CrossTheStreet:
         self.yCurrent = 0.5
         self.zCurrent = 0
 
-        self.zTime = 0
         self.zTrackBegin = -12  # terreno inicia em -12
         self.TIMER_1_ID = 0
         self.TIMER_1_INTERVAL = 10
@@ -81,7 +80,6 @@ class CrossTheStreet:
 
         # Numero de passos totais do jogador
         self.steps = 0
-
         # Numero de passos para frente do jogador
         self.stepsZ = 0
 
@@ -167,7 +165,6 @@ class CrossTheStreet:
             self.eyeZ = 0.5
             # a direção em que a câmera aponta dependerá para onde o personagem estiver olhando (frente)
             self.changeCameraDirection()
-
             
     def changeFrontAnticlockwise(self):
         # muda câmera no sentido anti-horário
@@ -274,8 +271,6 @@ class CrossTheStreet:
             elif direction == 'left':
                 self.centerZ = self.centerZ - 0.2            
 
-
-
     # timer usado para mover os carros
     def onTimer1(self, value: int):
         if value != 0:
@@ -330,6 +325,25 @@ class CrossTheStreet:
             self.nextLevel = True
             self.beginAnimation = False
             glutPostRedisplay()
+
+    # Renicializa algumas variaveis para caso de Restart ou Next Level
+    def restartVariables(self):
+        self.alpha = 0
+        self.beginAnimation = True
+        self.carHitPlayer = False
+        self.crashedInSomething = False
+        self.fieldsInitialized = False
+        self.jump = 'w'
+        self.previousJump = 'w'
+        self.isRunningTimer1 = False
+        self.isRunningTimer2 = False
+        self.time = 0
+        self.xCurrent = 0
+        self.yCurrent = 0.5
+        self.zCurrent = 0
+        self.steps = 0
+        self.stepsZ = 0
+        self.nextLevel = False        
 
     def onKeyboard(self, key: str, x: int, y: int):
         self.previousJump = self.jump
@@ -425,48 +439,15 @@ class CrossTheStreet:
 
         # recomeça o jogo reiniciando todas as variáveis
         elif key == 'r':
-            self.alpha = 0
-            self.beginAnimation = True
-            self.carHitPlayer = False
-            self.crashedInSomething = False
-            self.fieldsInitialized = False
-            self.jump = 'w'
-            self.previousJump = 'w'
-            self.isRunningTimer1 = False
-            self.isRunningTimer2 = False
-            self.time = 0
-            self.xCurrent = 0
-            self.yCurrent = 0.5
-            self.zCurrent = 0
-            self.zTime = 0
-            self.steps = 0
-            self.stepsZ = 0
+            self.restartVariables()
             self.level = 0 # comeca da primeira fase
-            self.nextLevel = False
             glutPostRedisplay()
         # para comecar a proxima fase    
-        elif key == 'n':
-            self.alpha = 0
-            self.beginAnimation = True
-            self.carHitPlayer = False
-            self.crashedInSomething = False
-            self.fieldsInitialized = False
-            self.jump = 'w'
-            self.previousJump = 'w'
-            self.isRunningTimer1 = False
-            self.isRunningTimer2 = False
-            self.time = 0
-            self.xCurrent = 0
-            self.yCurrent = 0.5
-            self.zCurrent = 0
-            self.zTime = 0
-            self.steps = 0
-            self.stepsZ = 0
+        elif key == 'n' and self.nextLevel == True:
+            self.restartVariables()
             self.level += 1 # proxima fase
-            self.nextLevel = False
             glutPostRedisplay()
     
-
     # o jogo funciona como uma esteira: as coordenadas do jogador e da câmera permanecem estáticas
     # enquanto o campo e os objetos presentes nele se mexem em relação ao jogador
     def moveObjects(self):
@@ -504,56 +485,34 @@ class CrossTheStreet:
                     self.fieldsMatrix[i, j - 1].carPosition = self.fieldsMatrix[i, j].carPosition
                     self.fieldsMatrix[i, j - 1].treeHeight = self.fieldsMatrix[i, j].treeHeight
 
+    # Define o campo de acordo com o level
+    def defineLevel(self, i, j, streetSize, fieldVariable):
+        if (j > fieldVariable):
+            self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+        elif (j % streetSize == 0):
+            self.fieldsMatrix[i, j].forestOrStreet = 'forest'
+        else:
+            self.fieldsMatrix[i, j].forestOrStreet = 'street'
+
+        if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
+            self.fieldsMatrix[i, j].isEmpty = False
+            self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
+        else:
+            self.fieldsMatrix[i, j].isEmpty = True
+
+        self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
+
     # posição das árvores aleatóras e posição dos carros
-    def fieldsInitialization(self, fase):
+    def fieldsInitialization(self, level):
         rd.seed()
         for i in range(0, 20):
             for j in range(0, 25):
-                if (fase == 0):
-                    if (j > 9):
-                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                    elif (j % 3 == 0):
-                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                    else:
-                        self.fieldsMatrix[i, j].forestOrStreet = 'street'
-
-                    if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
-                        self.fieldsMatrix[i, j].isEmpty = False
-                        self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
-                    else:
-                        self.fieldsMatrix[i, j].isEmpty = True
-
-                    self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
-                elif (fase == 1):
-                    if (j > 8):
-                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                    elif (j % 4 == 0):
-                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                    else:
-                        self.fieldsMatrix[i, j].forestOrStreet = 'street'
-
-                    if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
-                        self.fieldsMatrix[i, j].isEmpty = False
-                        self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
-                    else:
-                        self.fieldsMatrix[i, j].isEmpty = True
-
-                    self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i
+                if (level == 0):
+                    self.defineLevel(i, j, 3, 9)
+                elif (level == 1):
+                    self.defineLevel(i, j, 4, 8)
                 elif (fase == 2):
-                    if (j > 9):
-                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                    elif (j % 6 == 0):
-                        self.fieldsMatrix[i, j].forestOrStreet = 'forest'
-                    else:
-                        self.fieldsMatrix[i, j].forestOrStreet = 'street'
-
-                    if (rd.random() > 0.9 and self.fieldsMatrix[i, j].forestOrStreet == 'forest'):
-                        self.fieldsMatrix[i, j].isEmpty = False
-                        self.fieldsMatrix[i, j].treeHeight = mt.ceil(rd.random() * 3)
-                    else:
-                        self.fieldsMatrix[i, j].isEmpty = True
-
-                    self.fieldsMatrix[i, j].carPosition = rd.random() * 8 + 10 * i    
+                    self.defineLevel(i, j, 6, 9)
 
     def configureIllumination(self):
         glEnable(GL_LIGHTING)
@@ -753,7 +712,7 @@ class CrossTheStreet:
     def renderSkybox (self, x, y, z, width, height, length):
         # desenha 6 quadrados, adiciona textura a eles e os posiciona ao redor da
 
-        #Center the Skybox around the given x,y,z position
+        # Centraliza Skybox em torno das posicoes dadas x,y e z 
         x = x - width  / 2
         y = y - height / 2
         z = z - length / 2
@@ -761,9 +720,9 @@ class CrossTheStreet:
         #Coloração branca para os quadrados
         glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
 
-        #Draw Front side
+        # Desenha parte da frente
         glBindTexture(GL_TEXTURE_2D, self.SKYFRONT)
-        glBegin(GL_QUADS);		
+        glBegin(GL_QUADS)		
         glTexCoord2f(1.0, 0.0)
         glVertex3f(x, y, z + length)
         glTexCoord2f(1.0, 1.0)
@@ -775,7 +734,7 @@ class CrossTheStreet:
         glEnd()    
         glBindTexture(GL_TEXTURE_2D, 0)
 
-        #Draw Back side
+        # Desenha parte de tras
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYBACK)
         glBegin(GL_QUADS)
@@ -791,10 +750,10 @@ class CrossTheStreet:
         glEnd()
         glBindTexture(GL_TEXTURE_2D, 0)
 
-        #Draw Left side
+        # Desenha parte esquerda
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYLEFT)
-        glBegin(GL_QUADS);		
+        glBegin(GL_QUADS)	
         glTexCoord2f(1.0, 1.0)
         glVertex3f(x, y+height,z)
         glTexCoord2f(0.0, 1.0)
@@ -806,22 +765,22 @@ class CrossTheStreet:
         glEnd()
         glBindTexture(GL_TEXTURE_2D, 0)
 
-        #Draw Right side
+        # Desenha parte direita
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYRIGHT)
-        glBegin(GL_QUADS);		
+        glBegin(GL_QUADS)	
         glTexCoord2f(0.0, 0.0) 
         glVertex3f(x+width, y, z)
         glTexCoord2f(1.0, 0.0)
         glVertex3f(x+width, y, z+length)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x+width, y+height,	z+length)
+        glVertex3f(x+width, y+height, z+length)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x+width, y+height,	z)
+        glVertex3f(x+width, y+height, z)
         glEnd()
         glBindTexture(GL_TEXTURE_2D, 0)
 
-        #Draw Up side
+        # Desenha lado de cima
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYUP)
         glBegin(GL_QUADS)	
@@ -830,16 +789,16 @@ class CrossTheStreet:
         glTexCoord2f(1.0, 0.0)
         glVertex3f(x+width, y+height, z+length)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x,		  y+height,	z+length)
+        glVertex3f(x, y+height,	z+length)
         glTexCoord2f(0.0, 1.0)
         glVertex3f(x,y+height,	z)
         glEnd()
         glBindTexture(GL_TEXTURE_2D, 0)
 
-        #Draw Down side
+        # Desenha lado de baixo
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYDOWN)
-        glBegin(GL_QUADS);		
+        glBegin(GL_QUADS)		
         glTexCoord2f(0.0, 0.0)
         glVertex3f(x, y, z)
         glTexCoord2f(1.0, 0.0)
@@ -1268,7 +1227,6 @@ class CrossTheStreet:
     # funcao para renderizar texto
     def renderText(self, text, x, y, red, green, blue):
 
-        glDisable(GL_TEXTURE_2D)
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)
         glMatrixMode(GL_PROJECTION)
