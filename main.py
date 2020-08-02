@@ -62,7 +62,7 @@ class CrossTheStreet:
 
         self.currentFront = 'w' # direção da frente do personagem  
         self.gameMode = 3 # inicializa o jogo em modo de terceira pessoa
-        
+
         # posição da câmera em terceira pessoa 
         self.eyeX = 1
         self.eyeY = 7 - self.yCurrent
@@ -226,6 +226,31 @@ class CrossTheStreet:
 
         return key
 
+    def sneakPeek(self, direction):
+        # eixo para onde virará a olhadinha depende da frente do jogador
+        if (self.currentFront == 'w'):
+            if direction == 'right':
+                self.centerX = self.centerX + 0.2
+            elif direction == 'left':
+                self.centerX = self.centerX - 0.2
+        elif (self.currentFront == 'a'):
+            if direction == 'right':
+                self.centerZ = self.centerZ - 0.2
+            elif direction == 'left':
+                self.centerZ = self.centerZ + 0.2            
+        elif (self.currentFront == 's'):
+            if direction == 'right':
+                self.centerX = self.centerX - 0.2
+            elif direction == 'left':
+                self.centerX = self.centerX + 0.2            
+        elif (self.currentFront == 'd'):
+            if direction == 'right':
+                self.centerZ = self.centerZ + 0.2
+            elif direction == 'left':
+                self.centerZ = self.centerZ - 0.2            
+
+
+
     # timer usado para mover os carros
     def onTimer1(self, value: int):
         if value != 0:
@@ -345,14 +370,18 @@ class CrossTheStreet:
             self.gameMode = 3
             self.changeGameMode()
 
-        elif key == 'o': # muda camera no sentido anti-horário
-            if self.gameMode == 1:
+        elif key == 'o' and  self.gameMode == 1: # muda camera no sentido anti-horário
                 self.changeFrontAnticlockwise()
                 self.changeCameraDirection()
-        elif key == 'p': # muda camera no sentido horário
-            if self.gameMode == 1:
+        elif key == 'p' and self.gameMode == 1: # muda camera no sentido horário
                 self.changeFrontClockwise()
                 self.changeCameraDirection()
+
+        # olhadinha para os lados (para ver os carros ao atravessar a rua em primeira pessoa)
+        elif key == '4' and self.gameMode == 1:
+            self.sneakPeek('left')
+        elif key == '5' and self.gameMode == 1:
+           self.sneakPeek('right')
 
         # recomeça o jogo reiniciando todas as variáveis
         elif key == 'r':
