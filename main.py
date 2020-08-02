@@ -1,4 +1,3 @@
-import glm
 import math as mt
 import random as rd
 import sys
@@ -21,14 +20,12 @@ def loadTexture(texture_url):
     glBindTexture(GL_TEXTURE_2D, 0)
     return tex_id   
 
-
 class Field:
     def __init__(self):
         self.forestOrStreet = None
         self.isEmpty = None
         self.carPosition = None
         self.treeHeight = None
-
 
 class CrossTheStreet:
     def __init__(self):
@@ -65,6 +62,7 @@ class CrossTheStreet:
 
         self.currentFront = 'w' # direção da frente do personagem  
         self.gameMode = 3 # inicializa o jogo em modo de terceira pessoa
+        
         # posição da câmera em terceira pessoa 
         self.eyeX = 1
         self.eyeY = 7 - self.yCurrent
@@ -74,9 +72,9 @@ class CrossTheStreet:
         self.centerZ = 0              
 
         #posição da luz
-        self.lightPosX = 8
-        self.lightPosY = 9
-        self.lightPosZ = -63
+        self.lightPosX = 0
+        self.lightPosY = 4.5
+        self.lightPosZ = 3
         self.lightPosJoker = 1
 
     def run(self):
@@ -280,13 +278,6 @@ class CrossTheStreet:
         self.previousJump = self.jump
         keycode = ord(key)
         key = key.decode('utf-8')
-
-        print("light:")
-        print(self.lightPosX)
-        print(self.lightPosY)
-        print(self.lightPosZ)
-        print(self.lightPosJoker)
-
         # Primeira pessoa: as teclas mudam de direção dependendo de
         # onde é a frente do personagem
         if(self.gameMode == 1):
@@ -297,57 +288,7 @@ class CrossTheStreet:
 
         if keycode == 27:
             sys.exit()
-
-
-
-        elif key == '7':
-            self.eyeX = self.eyeX + 1
-        elif key == '4':
-            self.eyeX = self.eyeX - 1
-        elif key == '8':
-            self.eyeY = self.eyeY + 1
-        elif key == '5':
-            self.eyeY = self.eyeY - 1 
-        elif key == '9':
-            self.eyeZ = self.eyeZ + 1
-        elif key == '6':
-            self.eyeZ = self.eyeZ - 1
-
-
-        elif key == 'f':
-            self.centerX = self.centerX + 1
-        elif key == 'v':
-            self.centerX = self.centerX - 1
-        elif key == 'g':
-            self.centerY = self.centerY + 1
-        elif key == 'b':
-            self.centerY = self.centerY - 1 
-        elif key == 'h':
-            self.centerZ = self.centerZ + 1
-        elif key == 'n':
-            self.centerZ = self.centerZ - 1
-
             
-
-        elif key == 'F':
-            self.lightPosX = self.lightPosX + 1
-        elif key == 'V':
-            self.lightPosX = self.lightPosX - 1
-        elif key == 'G':
-            self.lightPosY = self.lightPosY + 1
-        elif key == 'B':
-            self.lightPosY = self.lightPosY - 1 
-        elif key == 'H':
-            self.lightPosZ = self.lightPosZ + 1
-        elif key == 'N':
-            self.lightPosZ = self.lightPosZ - 1            
-        elif key == 'J':
-            self.lightPosJoker = self.lightPosJoker + 1
-        elif key == 'M':
-            self.lightPosJoke = self.lightPosJoker - 1  
-
-            
-
         elif key == 'w':  # para frente
             if (self.fieldsMatrix[int(self.xCurrent + 10), -self.zTrackBegin - 1].isEmpty == True) and self.beginAnimation == True and self.isRunningTimer2 == False and self.yCurrent == 0.5:
                 self.alpha = 0
@@ -491,14 +432,21 @@ class CrossTheStreet:
     def configureIllumination(self):
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
-        position = (GLfloat * 4)(self.lightPosX, self.lightPosY, self.lightPosZ, self.lightPosJoker)
+        glEnable(GL_LIGHT1)
+        position = (GLfloat * 4)(0, self.lightPosY, self.lightPosZ, self.lightPosJoker)
         ambient = (GLfloat * 4)(0.1, 0.1, 0.1, 1)
         diffuse = (GLfloat * 4)(0.7, 0.7, 0.7, 1)
         specular = (GLfloat * 4)(0.9, 0.9, 0.9, 1)
         glLightfv(GL_LIGHT0, GL_POSITION, position)
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambient)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse)
-        glLightfv(GL_LIGHT0, GL_SPECULAR, specular)    
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specular)
+
+        position = (GLfloat * 4)(0, 4.5,-63, 1)
+        glLightfv(GL_LIGHT1, GL_POSITION, position)
+        glLightfv(GL_LIGHT1, GL_AMBIENT, ambient)
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse)
+        glLightfv(GL_LIGHT1, GL_SPECULAR, specular)
 
     def renderForest(self):
         glPushMatrix()
@@ -684,15 +632,8 @@ class CrossTheStreet:
         y = y - height / 2
         z = z - length / 2
 
-        #glDisable(GL_LIGHTING)
-        #glColor3f(1, 1, 1)
-        ambient = (GLfloat * 4)(1, 1, 1, 1)
-        specular = (GLfloat * 4)(1, 1, 1, 1)
-        brightness = (GLfloat * 1)(0)
-        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient)
-        glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
-        glMaterialfv(GL_FRONT, GL_SHININESS, brightness)
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
+        #Coloração branca para os quadrados
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
 
         #Draw Front side
         glBindTexture(GL_TEXTURE_2D, self.SKYFRONT)
