@@ -705,7 +705,7 @@ class CrossTheStreet:
 
     def renderSkybox (self, x, y, z, width, height, length):
         glDisable(GL_LIGHTING)
-        # desenha 6 quadrados, adiciona textura a eles e os posiciona ao redor da
+        # desenha 6 quadrados, adiciona textura a eles e os posiciona ao redor da cena
 
         # Centraliza Skybox em torno das posicoes dadas x,y e z 
         x = x - width  / 2
@@ -806,6 +806,8 @@ class CrossTheStreet:
         glVertex3f(x+width, y,	z)
         glEnd()    
         glBindTexture(GL_TEXTURE_2D, 0)
+
+        glEnable(GL_LIGHTING)
 
     def renderCar(self, x, z):
 
