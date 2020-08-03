@@ -916,21 +916,6 @@ class CrossTheStreet:
         glutSolidCube(0.8)
         glPopMatrix()
 
-        if (x % 7 == 0):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(204.0 / 256, 0, 0, 0))
-        elif (x % 7 == 1):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 0, 0))
-        elif (x % 7 == 2):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 76.0 / 256, 153.0 / 256, 0))
-        elif (x % 7 == 3):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(204.0 / 256, 0, 102.0 / 256, 0))
-        elif (x % 7 == 4):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0, 153.0 / 256, 153.0 / 256, 0))
-        elif (x % 7 == 5):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(0.2, 0.2, 0.2, 0))
-        elif (x % 7 == 6):
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, (GLfloat * 4)(1, 1, 1, 0))
-
         # Retrovisores
         glPushMatrix()
         glTranslatef(0.2, 0.13, 0)
