@@ -714,9 +714,7 @@ class CrossTheStreet:
 
         #Coloração branca para os quadrados
         glColor3f(1, 1, 1)
-
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (GLfloat * 4)(1.0, 1.0, 1.0))
-
+        
         # Desenha parte da frente
         glColor3f(1, 1, 1)
         glBindTexture(GL_TEXTURE_2D, self.SKYFRONT)
